@@ -194,7 +194,6 @@ public class projectEditor extends AppCompatActivity {
                 builder_add.show();
                 return true;
             case R.id.project_update:
-                /**
                 final CharSequence[] items_update = {"Update", "Cancel"};
                 AlertDialog.Builder builder_update = new AlertDialog.Builder(projectEditor.this);
                 builder_update.setTitle("Select options");
@@ -215,7 +214,8 @@ public class projectEditor extends AppCompatActivity {
                             } else if (projectDate.matches(date)) {
                                 Toast.makeText(projectEditor.this, "Please select a date.", Toast.LENGTH_SHORT).show();
                             } else {
-                                mDbHelper.update_project(selectedID, locationString, conNameString, conNumString, projectDate, descriptionString, titleString, noteString);
+
+                                updateProject(selectedID,titleString,descriptionString,conNameString,conNumString,projectDate,locationString,noteString);
                                 Intent intent = new Intent(projectEditor.this, MainActivity.class);
                                 startActivity(intent);
                             }
@@ -226,15 +226,14 @@ public class projectEditor extends AppCompatActivity {
                 });
                 builder_update.show();
                 return true;
-                 **/
+
             // Respond to a click on the "Delete" menu option
             case R.id.project_delete:
                 DialogInterface.OnClickListener deleteButtonClickListener =
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //mDbHelper.delete_project(selectedID);
-                                //mDbHelper.delete_allProjectAddOn(selectedID);
+                                deleteProject(selectedID);
                                 Intent intent = new Intent(projectEditor.this, MainActivity.class);
                                 startActivity(intent);
                             }
@@ -292,6 +291,30 @@ public class projectEditor extends AppCompatActivity {
         if (HideMenu == 1) {
             HIDE_MENU = true;
         }
+    }
+
+    private boolean updateProject(String id, String titleString,String descriptionString,String conNameString,String conNumString,String projectDate,String locationString,String noteString){
+        DatabaseReference databaseNewProject= FirebaseDatabase.getInstance().getReference("Projects");
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        newProjectProvider newProjectProvider = new newProjectProvider(id,titleString,descriptionString,conNameString,conNumString,projectDate,locationString,noteString);
+
+        databaseNewProject.child(UID).child(id).setValue(newProjectProvider);
+
+        Toast.makeText(this,"Project Updated Successfully",Toast.LENGTH_SHORT).show();
+
+        return true;
+    }
+
+    private void deleteProject(String selectedID){
+        String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference deleteProject = FirebaseDatabase.getInstance().getReference("Projects");
+        DatabaseReference deleteProjectAddOn = FirebaseDatabase.getInstance().getReference("Projects Add On");
+
+        deleteProject.child(UID).child(selectedID).removeValue();
+        deleteProjectAddOn.child(selectedID).removeValue();
+
+        Toast.makeText(this,"Project is deleted",Toast.LENGTH_SHORT).show();
     }
 
     public void initCheckUnsavedChanges() {

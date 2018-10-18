@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.step.id.project01.R;
+import com.step.id.project01.RecyclerView.RecyclerTouchListener;
 import com.step.id.project01.RecyclerView.projectAddOnAdapter;
 import com.step.id.project01.model.ProjectAddOnProvider;
 import com.step.id.project01.sqlitedata.ProjectDbHelper;
@@ -71,57 +72,48 @@ public class projectList extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-/**
- projectRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(projectList.this, projectRecyclerView, new RecyclerTouchListener.ClickListener() {
-@Override public void onClick(View view, int position) {
 
-int status = listNewProjectProviders.get(position).getStatus();
-String date = listNewProjectProviders.get(position).getDate();
-String notes = listNewProjectProviders.get(position).getNotes();
+        projectRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(projectList.this, projectRecyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
 
-ImageView projImage = (ImageView) view.findViewById(R.id.projectList_Image);
-projImage.setDrawingCacheEnabled(true);
-projImage.buildDrawingCache();
-final Bitmap bitmap = projImage.getDrawingCache();
-ByteArrayOutputStream stream = new ByteArrayOutputStream();
-bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-byte[] bytes = stream.toByteArray();
+                String rowid = listNewProjectProviders.get(position).getId();
+                String status = listNewProjectProviders.get(position).getStatus();
+                String date = listNewProjectProviders.get(position).getDate();
+                String notes = listNewProjectProviders.get(position).getNotes();
+
+               // ImageView projImage = (ImageView) view.findViewById(R.id.projectList_Image);
+                //projImage.setDrawingCacheEnabled(true);
+                //projImage.buildDrawingCache();
+                //final Bitmap bitmap = projImage.getDrawingCache();
+                //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                //bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                //byte[] bytes = stream.toByteArray();
 
 
-int HideMenu = 1;
+                int HideMenu = 1;
+                Log.d(TAG, "The row id is: " + rowid);
 
-Long rowid = listNewProjectProviders.get(position).getId();
-Cursor data = projectDbHelper.getProjectAddOnItemID(rowid);
-Log.d(TAG, "The row id is: " + rowid);
+                    Log.d(TAG, "onItemClick: The ID is: " + rowid);
+                    Intent intent = new Intent(projectList.this, projectAddOn.class);
+                    intent.putExtra("projectAddOn", rowid);
+                    intent.putExtra("projectID", selectedID);
+                    intent.putExtra("projImage", listNewProjectProviders.get(position).getImgURL());
+                    intent.putExtra("status", status);
+                    intent.putExtra("date", date);
+                    intent.putExtra("notes", notes);
+                    intent.putExtra("HideMenu", HideMenu);
+                    Log.d(TAG, "The row id is: " + rowid);
+                    startActivity(intent);
 
-int itemID = -1;
-while (data.moveToNext()) {
-itemID = data.getInt(0);
-status = data.getInt(1);
-date = data.getString(2);
-notes = data.getString(3);
-}
-if (itemID > -1) {
-Log.d(TAG, "onItemClick: The ID is: " + itemID);
-Intent intent = new Intent(projectList.this, projectAddOn.class);
-intent.putExtra("id", itemID);
-intent.putExtra("projectId", selectedID);
-intent.putExtra("projImage", bytes);
-intent.putExtra("status", status);
-intent.putExtra("date", date);
-intent.putExtra("notes", notes);
-intent.putExtra("HideMenu", HideMenu);
-Log.d(TAG, "The row id is: " + rowid);
-startActivity(intent);
-}
 
-}
+            }
 
-@Override public void onLongClick(View view, int position) {
+            @Override
+            public void onLongClick(View view, int position) {
 //
-}
-}));
- **/
+            }
+        }));
 
     }
 

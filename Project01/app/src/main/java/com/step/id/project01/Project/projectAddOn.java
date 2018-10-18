@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -52,6 +51,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.step.id.project01.R;
 import com.step.id.project01.model.ProjectAddOnProvider;
 import com.step.id.project01.sqlitedata.ProjectDbHelper;
@@ -77,9 +77,9 @@ public class projectAddOn extends AppCompatActivity {
 
     //update data
     private String selectednotes, selectedprojDate;
-    private Bitmap selectedImage;
-    private int HideMenu, selectedStatus;
-    private String selectedID, selectedProjectID;
+    private String selectedImage;
+    private int HideMenu;
+    private String selectedID, selectedProjectID,selectedStatus="Completed";
     private boolean HIDE_MENU = false;
 
 
@@ -90,6 +90,7 @@ public class projectAddOn extends AppCompatActivity {
     //Fire base
     private DatabaseReference mDatabaseAddon;
     private StorageReference mStorageReference;
+    private FirebaseStorage mStorage;
 
     //Camera
     ImageView projectAddOnImage;
@@ -130,6 +131,7 @@ public class projectAddOn extends AppCompatActivity {
         initCheckUnsavedChanges();
 
         mDatabaseAddon = FirebaseDatabase.getInstance().getReference("Projects Add On").child(selectedID);
+        mStorage = FirebaseStorage.getInstance();
         mStorageReference = FirebaseStorage.getInstance().getReference("Projects Add On");
 
 
@@ -332,6 +334,17 @@ public class projectAddOn extends AppCompatActivity {
         // Apply the adapter to the spinner
         mProjectStatusSpinner.setAdapter(projectTypeSpinnerAdapter);
 
+        if(selectedStatus.equals("Completed")) {
+            int selectionPosition = projectTypeSpinnerAdapter.getPosition("Completed");
+            mProjectStatusSpinner.setSelection(selectionPosition);
+        }else if(selectedStatus.equals("In Progress")){
+            int selectionPosition = projectTypeSpinnerAdapter.getPosition("In Progress");
+            mProjectStatusSpinner.setSelection(selectionPosition);
+        }else{
+            int selectionPosition = projectTypeSpinnerAdapter.getPosition("Deferred");
+            mProjectStatusSpinner.setSelection(selectionPosition);
+        }
+
         // Set the integer mSelected to the constant values
         mProjectStatusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -387,22 +400,22 @@ public class projectAddOn extends AppCompatActivity {
     public void initUpdate() {
         Intent receivedIntent = getIntent();
         selectedID = receivedIntent.getStringExtra("projectID");
-        //selectedProjectID = receivedIntent.getIntExtra("projectId",-1);
-        Log.d(TAG, "Project add on id is : " + selectedID);
-        selectedStatus = receivedIntent.getIntExtra("status", 0);
         selectednotes = receivedIntent.getStringExtra("notes");
         HideMenu = receivedIntent.getIntExtra("HideMenu", 0);
 
         if (HideMenu == 1) {
-            byte[] bytes = receivedIntent.getByteArrayExtra("projImage");
-            selectedImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            selectedImage = receivedIntent.getStringExtra("projImage");
+            selectedStatus = receivedIntent.getStringExtra("status");
             selectedprojDate = receivedIntent.getStringExtra("date");
             mProjectAddOnDate.setText(selectedprojDate);
-            // selectedProjectID = receivedIntent.getIntExtra("projectId",-1);
+            selectedProjectID = receivedIntent.getStringExtra("projectAddOn");
+
+            Picasso.get().load(selectedImage)
+                    .fit()
+                    .centerCrop()
+                    .into(projectAddOnImage);
         }
 
-
-        projectAddOnImage.setImageBitmap(selectedImage);
         mProjectAddOnNotes.setText(selectednotes);
 
 
@@ -410,6 +423,28 @@ public class projectAddOn extends AppCompatActivity {
         if (HideMenu == 1) {
             HIDE_MENU = true;
         }
+    }
+
+    private boolean updateProject(String id, String imgUri,String noteString,String projDate,String stutus){
+        DatabaseReference databaseNewProject= FirebaseDatabase.getInstance().getReference("Projects Add On");
+
+        ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(id,imgUri,noteString,projDate,stutus);
+
+        databaseNewProject.child(selectedID).child(id).setValue(newProjectProvider);
+
+        Toast.makeText(this,"Project Updated Successfully",Toast.LENGTH_SHORT).show();
+
+        return true;
+    }
+
+    private void deleteProjectAddOn(String id){
+        DatabaseReference deleteProjectAddOn = FirebaseDatabase.getInstance().getReference("Projects Add On");
+
+        StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
+        imageRef.delete();
+        deleteProjectAddOn.child(selectedID).child(id).removeValue();
+
+        Toast.makeText(this,"Project is deleted",Toast.LENGTH_SHORT).show();
     }
 
     public void initCheckUnsavedChanges() {
@@ -552,18 +587,55 @@ public class projectAddOn extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (items_update[which].equals("Update")) {
-                            String noteString = mProjectAddOnNotes.getText().toString().trim();
-                            String projectDate = mProjectAddOnDate.getText().toString().trim();
-                            Bitmap imgBitmap = ((BitmapDrawable) projectAddOnImage.getDrawable()).getBitmap();
-                            // mSelectedProject = (newProjectProvider) mSpinnerProjectID.getSelectedItem();
-                            if (imgBitmap == null) {
-                                Toast.makeText(projectAddOn.this, "Image cannot be null.", Toast.LENGTH_SHORT).show();
-                            } else if (projectDate.matches(date)) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            final String noteString = mProjectAddOnNotes.getText().toString().trim();
+                            final String projectDate = mProjectAddOnDate.getText().toString().trim();
+
+                            if (projectDate.matches(date)) {
+                                progressBar.setVisibility(View.GONE);
                                 Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                //mDbHelper.update_projectAddOn(selectedID, mProjectStatus, projectDate, noteString, Untils.getBytes(imgBitmap), selectedProjectID);
+                            }
+
+
+                            if (selectImageUrl != null) {
+                                StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
+                                        + "." + getFileExtension(selectImageUrl));
+
+                                fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        progressBar.setVisibility(View.GONE);
+                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                        while(!uriTask.isSuccessful());
+                                        Uri downloadUri = uriTask.getResult();
+                                        Toast.makeText(getApplicationContext(),"Upload successful",Toast.LENGTH_SHORT).show();
+                                        updateProject(selectedProjectID,downloadUri.toString(),noteString,projectDate,mProjectStatus);
+                                        Intent intent = new Intent(projectAddOn.this, projectList.class);
+                                        intent.putExtra("projectID", selectedID);
+                                        startActivity(intent);
+                                    }
+                                })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                            }else{
+                                progressBar.setVisibility(View.GONE);
+                                DatabaseReference databaseNewProject= FirebaseDatabase.getInstance().getReference("Projects Add On");
+
+                                ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID,selectedImage,noteString,projectDate,mProjectStatus);
+                                StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
+                                imageRef.delete();
+
+                                databaseNewProject.child(selectedID).child(selectedProjectID).setValue(newProjectProvider);
+
+                                Toast.makeText(projectAddOn.this,"Project Updated Successfully",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
-                                intent.putExtra("id", selectedProjectID);
+                                intent.putExtra("projectID", selectedID);
                                 startActivity(intent);
                             }
                         } else if (items_update[which].equals("Cancel")) {
@@ -580,9 +652,9 @@ public class projectAddOn extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // mDbHelper.delete_projectAddOn(selectedID);
+                                deleteProjectAddOn(selectedProjectID);
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
-                                intent.putExtra("id", selectedProjectID);
+                                intent.putExtra("projectID", selectedID);
                                 startActivity(intent);
                             }
                         };
@@ -602,7 +674,7 @@ public class projectAddOn extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // User clicked "Discard" button, navigate to parent activity.
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
-                                intent.putExtra("id", selectedProjectID);
+                                intent.putExtra("projectID", selectedID);
                                 startActivity(intent);
                             }
                         };
