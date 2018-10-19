@@ -82,15 +82,6 @@ public class projectList extends AppCompatActivity {
                 String date = listNewProjectProviders.get(position).getDate();
                 String notes = listNewProjectProviders.get(position).getNotes();
 
-               // ImageView projImage = (ImageView) view.findViewById(R.id.projectList_Image);
-                //projImage.setDrawingCacheEnabled(true);
-                //projImage.buildDrawingCache();
-                //final Bitmap bitmap = projImage.getDrawingCache();
-                //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                //bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                //byte[] bytes = stream.toByteArray();
-
-
                 int HideMenu = 1;
                 Log.d(TAG, "The row id is: " + rowid);
 
@@ -105,16 +96,13 @@ public class projectList extends AppCompatActivity {
                     intent.putExtra("HideMenu", HideMenu);
                     Log.d(TAG, "The row id is: " + rowid);
                     startActivity(intent);
-
-
             }
 
             @Override
             public void onLongClick(View view, int position) {
-//
+
             }
         }));
-
     }
 
     public void onRetrieve() {

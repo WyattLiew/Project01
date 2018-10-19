@@ -34,6 +34,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
     private void initid() {
         findViewById(R.id.user_login).setOnClickListener(this);
         findViewById(R.id.user_signup).setOnClickListener(this);
+        findViewById(R.id.user_forgotPassword).setOnClickListener(this);
         progressBar =(ProgressBar) findViewById(R.id.login_progressBar);
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword =(EditText) findViewById(R.id.editTextPassword);
@@ -75,10 +76,14 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
-                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                    if(mAuth.getCurrentUser().isEmailVerified()) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }else{
+                        Toast.makeText(getApplicationContext(),"Please verify your email address",Toast.LENGTH_SHORT).show();
+                    }
                 }else{
                     Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                 }
@@ -95,6 +100,10 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
             case  R.id.user_signup:
                 Intent intent = new Intent (getApplicationContext(),registerActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.user_forgotPassword:
+                startActivity(new Intent(LoginActivity.this,ForgotPasswordActivity.class));
+                break;
         }
     }
 }

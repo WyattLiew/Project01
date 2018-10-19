@@ -58,11 +58,7 @@ public class tab2_project extends Fragment {
         databaseNewProject = FirebaseDatabase.getInstance().getReference();
         projectsRef = databaseNewProject.child("Projects").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        //initObject();
         onRetrieve();
-
-
-
 
         projectRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), projectRecyclerView, new RecyclerTouchListener.ClickListener() {
             @Override

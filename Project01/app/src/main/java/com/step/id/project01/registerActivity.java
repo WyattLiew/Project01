@@ -1,5 +1,6 @@
 package com.step.id.project01;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -36,8 +37,8 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
     protected void onStart() {
         super.onStart();
 
-        if(mAuth.getCurrentUser() != null){
-
+        if(mAuth.getCurrentUser() != null && mAuth.getCurrentUser().isEmailVerified()){
+            startActivity(new Intent(registerActivity.this,MainActivity.class));
         }
     }
 
@@ -106,7 +107,10 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
            public void onComplete(@NonNull Task<AuthResult> task) {
                progressBar.setVisibility(View.GONE);
                if(task.isSuccessful()){
+
+                   String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
                    User user = new User(
+                           id,
                            name,
                            email,
                            phone
@@ -119,7 +123,20 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
                        public void onComplete(@NonNull Task<Void> task) {
                            progressBar.setVisibility(View.GONE);
                            if(task.isSuccessful()){
-                               Toast.makeText(getApplicationContext(),"User Registation Successful",Toast.LENGTH_SHORT).show();
+                               mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                   @Override
+                                   public void onComplete(@NonNull Task<Void> task) {
+                                       if(task.isSuccessful()) {
+                                           Toast.makeText(getApplicationContext(), "User Registation Successful, Please check your email for verification", Toast.LENGTH_LONG).show();
+                                           editTextEmail.setText("");
+                                           editTextName.setText("");
+                                           editTextPassword.setText("");
+                                           editTextPhone.setText("");
+                                       }else{
+                                           Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                                       }
+                                   }
+                               });
                            }else{
                                Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                            }
@@ -148,4 +165,5 @@ public class registerActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
     }
+
 }

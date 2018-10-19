@@ -8,9 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class tab1_main extends Fragment implements View.OnClickListener{
+public class tab1_main extends Fragment implements View.OnClickListener {
 
-    private CardView pendingCard,projectCard;
+    private CardView pendingCard, projectCard, monitorCard;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -18,11 +18,14 @@ public class tab1_main extends Fragment implements View.OnClickListener{
         final View rootView = inflater.inflate(R.layout.tab1_main, container, false);
 
 
-        pendingCard =(CardView)rootView.findViewById(R.id.pendingCard);
+        pendingCard = (CardView) rootView.findViewById(R.id.pendingCard);
         pendingCard.setOnClickListener(this);
 
-        projectCard = (CardView)rootView.findViewById(R.id.projectCard);
+        projectCard = (CardView) rootView.findViewById(R.id.projectCard);
         projectCard.setOnClickListener(this);
+
+        monitorCard = (CardView) rootView.findViewById(R.id.monitorCard);
+        monitorCard.setOnClickListener(this);
 
         return rootView;
     }
@@ -37,11 +40,15 @@ public class tab1_main extends Fragment implements View.OnClickListener{
                 startActivity(intent);
                 break;
             case R.id.projectCard:
-                intent = new Intent(getActivity(),projectEditor.class);
+                intent = new Intent(getActivity(), projectEditor.class);
                 startActivity(intent);
                 break;
-                default:
-                    break;
+            case R.id.monitorCard:
+                intent = new Intent(getActivity(), MonitorUserActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
         }
 
     }

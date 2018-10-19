@@ -79,7 +79,7 @@ public class projectAddOn extends AppCompatActivity {
     private String selectednotes, selectedprojDate;
     private String selectedImage;
     private int HideMenu;
-    private String selectedID, selectedProjectID,selectedStatus="Completed";
+    private String selectedID, selectedProjectID, selectedStatus = "Completed";
     private boolean HIDE_MENU = false;
 
 
@@ -180,7 +180,7 @@ public class projectAddOn extends AppCompatActivity {
 
         mProjectAddOnNotes = (EditText) findViewById(R.id.projectAddOnNotes);
         mProjectAddOnDate = (TextView) findViewById(R.id.projectAddOnDate);
-        progressBar =(ProgressBar) findViewById(R.id.addon_progressBar);
+        progressBar = (ProgressBar) findViewById(R.id.addon_progressBar);
         projectAddOnImage = (ImageView) findViewById(R.id.projectAddOn_img);
         mProjectStatusSpinner = (Spinner) findViewById(R.id.spinner_projectStatus);
     }
@@ -334,13 +334,13 @@ public class projectAddOn extends AppCompatActivity {
         // Apply the adapter to the spinner
         mProjectStatusSpinner.setAdapter(projectTypeSpinnerAdapter);
 
-        if(selectedStatus.equals("Completed")) {
+        if (selectedStatus.equals("Completed")) {
             int selectionPosition = projectTypeSpinnerAdapter.getPosition("Completed");
             mProjectStatusSpinner.setSelection(selectionPosition);
-        }else if(selectedStatus.equals("In Progress")){
+        } else if (selectedStatus.equals("In Progress")) {
             int selectionPosition = projectTypeSpinnerAdapter.getPosition("In Progress");
             mProjectStatusSpinner.setSelection(selectionPosition);
-        }else{
+        } else {
             int selectionPosition = projectTypeSpinnerAdapter.getPosition("Deferred");
             mProjectStatusSpinner.setSelection(selectionPosition);
         }
@@ -425,26 +425,26 @@ public class projectAddOn extends AppCompatActivity {
         }
     }
 
-    private boolean updateProject(String id, String imgUri,String noteString,String projDate,String stutus){
-        DatabaseReference databaseNewProject= FirebaseDatabase.getInstance().getReference("Projects Add On");
+    private boolean updateProject(String id, String imgUri, String noteString, String projDate, String stutus) {
+        DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects Add On");
 
-        ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(id,imgUri,noteString,projDate,stutus);
+        ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(id, imgUri, noteString, projDate, stutus);
 
         databaseNewProject.child(selectedID).child(id).setValue(newProjectProvider);
 
-        Toast.makeText(this,"Project Updated Successfully",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
 
         return true;
     }
 
-    private void deleteProjectAddOn(String id){
+    private void deleteProjectAddOn(String id) {
         DatabaseReference deleteProjectAddOn = FirebaseDatabase.getInstance().getReference("Projects Add On");
 
         StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
         imageRef.delete();
         deleteProjectAddOn.child(selectedID).child(id).removeValue();
 
-        Toast.makeText(this,"Project is deleted",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Project is deleted", Toast.LENGTH_SHORT).show();
     }
 
     public void initCheckUnsavedChanges() {
@@ -539,19 +539,19 @@ public class projectAddOn extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
                             } else {
-                                    StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
+                                StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
 
-                                    fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                         progressBar.setVisibility(View.GONE);
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                        while(!uriTask.isSuccessful());
+                                        while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
-                                        Toast.makeText(getApplicationContext(),"Upload successful",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
                                         String id = mDatabaseAddon.push().getKey();
-                                        ProjectAddOnProvider projectAddOnProvider = new ProjectAddOnProvider(id, downloadUri.toString(),mProjectAddOnNotes.getText().toString().trim(), mProjectAddOnDate.getText().toString().trim(), mProjectStatus);
+                                        ProjectAddOnProvider projectAddOnProvider = new ProjectAddOnProvider(id, downloadUri.toString(), mProjectAddOnNotes.getText().toString().trim(), mProjectAddOnDate.getText().toString().trim(), mProjectStatus);
                                         mDatabaseAddon.child(id).setValue(projectAddOnProvider);
                                         Intent intent = new Intent(projectAddOn.this, projectList.class);
                                         intent.putExtra("projectID", selectedID);
@@ -562,13 +562,13 @@ public class projectAddOn extends AppCompatActivity {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 progressBar.setVisibility(View.GONE);
-                                                Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                                             @Override
                                             public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                                               // double progress = (100.0 * taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                                                // double progress = (100.0 * taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
                                             }
                                         });
                             }
@@ -606,10 +606,12 @@ public class projectAddOn extends AppCompatActivity {
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                         progressBar.setVisibility(View.GONE);
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                        while(!uriTask.isSuccessful());
+                                        while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
-                                        Toast.makeText(getApplicationContext(),"Upload successful",Toast.LENGTH_SHORT).show();
-                                        updateProject(selectedProjectID,downloadUri.toString(),noteString,projectDate,mProjectStatus);
+                                        Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                                        StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
+                                        imageRef.delete();
+                                        updateProject(selectedProjectID, downloadUri.toString(), noteString, projectDate, mProjectStatus);
                                         Intent intent = new Intent(projectAddOn.this, projectList.class);
                                         intent.putExtra("projectID", selectedID);
                                         startActivity(intent);
@@ -619,21 +621,21 @@ public class projectAddOn extends AppCompatActivity {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 progressBar.setVisibility(View.GONE);
-                                                Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
-                            }else{
+                            } else {
                                 progressBar.setVisibility(View.GONE);
-                                DatabaseReference databaseNewProject= FirebaseDatabase.getInstance().getReference("Projects Add On");
+                                DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects Add On");
 
-                                ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID,selectedImage,noteString,projectDate,mProjectStatus);
+                                ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID, selectedImage, noteString, projectDate, mProjectStatus);
                                 StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
                                 imageRef.delete();
 
                                 databaseNewProject.child(selectedID).child(selectedProjectID).setValue(newProjectProvider);
 
-                                Toast.makeText(projectAddOn.this,"Project Updated Successfully",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(projectAddOn.this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
                                 intent.putExtra("projectID", selectedID);
                                 startActivity(intent);
