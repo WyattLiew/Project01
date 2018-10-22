@@ -75,6 +75,11 @@
     <string name="report_summary_description">Description of defect(s) : </string>
     <string name="action_update">action_update</string>
 
+    <!--
+    For report summary projectAddOn.java
+    -->
+    <string name="report_summary_Status">Project status: <xliff:g example="Completed" id="status">%s</xliff:g></string>
+
 
     <!--Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
     <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>

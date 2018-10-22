@@ -76,7 +76,7 @@ public class projectAddOn extends AppCompatActivity {
     ProgressBar progressBar;
 
     //update data
-    private String selectednotes, selectedprojDate;
+    private String selectednotes, selectedprojDate, reportMessage;
     private String selectedImage;
     private int HideMenu;
     private String selectedID, selectedProjectID, selectedStatus = "Completed";
@@ -447,6 +447,17 @@ public class projectAddOn extends AppCompatActivity {
         Toast.makeText(this, "Project is deleted", Toast.LENGTH_SHORT).show();
     }
 
+    private String createReportSummary(String status, String date, String notes) {
+        String reportMessage = "Hi";
+
+        reportMessage += "\n" + "\n" + getString(R.string.report_summary_Status, status);
+        reportMessage += "\n" + getString(R.string.report_summary_date, date);
+        reportMessage += "\n" + "\n" + getString(R.string.report_summary_comments, notes);
+        reportMessage += "\n" + "\n" + getString(R.string.report_summary_Thank_you);
+
+        return reportMessage;
+    }
+
     public void initCheckUnsavedChanges() {
         mProjectAddOnDate.setOnTouchListener(mTouchListener);
         projectAddOnImage.setOnTouchListener(mTouchListener);
@@ -519,11 +530,11 @@ public class projectAddOn extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_addon:
-                final CharSequence[] items_add = {"Save", "Cancel"};
+                final CharSequence[] items_add = {"Save and Email", "Save", "Cancel"};
                 AlertDialog.Builder builder_add = new AlertDialog.Builder(projectAddOn.this);
                 builder_add.setTitle("Select options");
                 builder_add.setItems(items_add, new DialogInterface.OnClickListener() {
@@ -572,6 +583,61 @@ public class projectAddOn extends AppCompatActivity {
                                             }
                                         });
                             }
+                        } else if (items_add[which].equals("Save and Email")) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            String projectDate = mProjectAddOnDate.getText().toString().trim();
+                            if (selectImageUrl == null) {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(projectAddOn.this, "Image cannot be null.", Toast.LENGTH_SHORT).show();
+                            } else if (projectDate.matches(date)) {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
+                                        + "." + getFileExtension(selectImageUrl));
+                                fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        progressBar.setVisibility(View.GONE);
+                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                        while (!uriTask.isSuccessful()) ;
+                                        Uri downloadUri = uriTask.getResult();
+                                        Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                                        String id = mDatabaseAddon.push().getKey();
+                                        ProjectAddOnProvider projectAddOnProvider = new ProjectAddOnProvider(id, downloadUri.toString(), mProjectAddOnNotes.getText().toString().trim(), mProjectAddOnDate.getText().toString().trim(), mProjectStatus);
+                                        mDatabaseAddon.child(id).setValue(projectAddOnProvider);
+                                        finish();
+
+                                        //Intent intent = new Intent(projectAddOn.this, projectList.class);
+                                        //intent.putExtra("projectID", selectedID);
+                                        //startActivity(intent);
+                                    }
+                                })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                                // double progress = (100.0 * taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                                            }
+                                        });
+                            }
+
+                            reportMessage = createReportSummary(mProjectStatus, mProjectAddOnDate.getText().toString(), mProjectAddOnNotes.getText().toString());
+                            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                            emailIntent.setType("image/*");
+                            emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, reportMessage);
+                            if (emailIntent.resolveActivity(getPackageManager()) != null) {
+                                startActivity(emailIntent);
+                            }
+
                         } else if (items_add[which].equals("Cancel")) {
                             dialog.dismiss();
                         }
@@ -580,7 +646,7 @@ public class projectAddOn extends AppCompatActivity {
                 builder_add.show();
                 return true;
             case R.id.action_update:
-                final CharSequence[] items_update = {"Update", "Cancel"};
+                final CharSequence[] items_update = {"Update and Email","Update", "Cancel"};
                 AlertDialog.Builder builder_update = new AlertDialog.Builder(projectAddOn.this);
                 builder_update.setTitle("Select options");
                 builder_update.setItems(items_update, new DialogInterface.OnClickListener() {
@@ -638,6 +704,79 @@ public class projectAddOn extends AppCompatActivity {
                                 intent.putExtra("projectID", selectedID);
                                 startActivity(intent);
                             }
+                        }else if(items_update[which].equals("Update and Email")){
+
+                            progressBar.setVisibility(View.VISIBLE);
+                            final String noteString = mProjectAddOnNotes.getText().toString().trim();
+                            final String projectDate = mProjectAddOnDate.getText().toString().trim();
+
+                            if (projectDate.matches(date)) {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
+                            }
+
+                            reportMessage = createReportSummary(mProjectStatus, mProjectAddOnDate.getText().toString(), mProjectAddOnNotes.getText().toString());
+                            Bitmap imgBitmap = ((BitmapDrawable)projectAddOnImage.getDrawable()).getBitmap();
+                            try {
+                                File root = Environment.getExternalStorageDirectory();
+                                if (root.canWrite()) {
+                                    pic = new File(root, "pic.png");
+                                    FileOutputStream out = new FileOutputStream(pic);
+                                    imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                                    out.flush();
+                                    out.close();
+                                }
+                            } catch (IOException e) {
+                                Log.e("BROKEN", "Could not write file " + e.getMessage());
+                            }
+                            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                            emailIntent.setType("image/*");
+                            emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
+                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
+                            emailIntent.putExtra(Intent.EXTRA_TEXT, reportMessage);
+                            if (emailIntent.resolveActivity(getPackageManager()) != null) {
+                                startActivity(emailIntent);
+                            }
+
+                            if (selectImageUrl != null) {
+                                StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
+                                        + "." + getFileExtension(selectImageUrl));
+
+                                fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        progressBar.setVisibility(View.GONE);
+                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                        while (!uriTask.isSuccessful()) ;
+                                        Uri downloadUri = uriTask.getResult();
+                                        Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                                        StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
+                                        imageRef.delete();
+                                        updateProject(selectedProjectID, downloadUri.toString(), noteString, projectDate, mProjectStatus);
+                                        finish();
+                                    }
+                                })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                progressBar.setVisibility(View.GONE);
+                                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects Add On");
+
+                                ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID, selectedImage, noteString, projectDate, mProjectStatus);
+
+                                databaseNewProject.child(selectedID).child(selectedProjectID).setValue(newProjectProvider);
+
+                                Toast.makeText(projectAddOn.this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+
+
                         } else if (items_update[which].equals("Cancel")) {
                             dialog.dismiss();
                         }
