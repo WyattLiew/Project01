@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.step.id.project01.firebase.User;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
@@ -59,7 +61,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         dialog = new ProgressDialog(this);
         profile_name = (TextView) findViewById(R.id.profile_name);
         profile_email = (TextView) findViewById(R.id.profile_email);
-        profile_img = (ImageView) findViewById(R.id.project_img);
+        profile_img = (ImageView) findViewById(R.id.profile_Image);
         profile_phone = (TextView) findViewById(R.id.profile_phone);
     }
 
@@ -73,10 +75,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 String name = projects.getName();
                 String email = projects.getEmail();
                 String phone = projects.getPhone();
+                String img = projects.getImgURL();
+                Log.d(TAG,"img URL is: " +img);
+
 
                 profile_name.setText(name);
                 profile_email.setText(email);
                 profile_phone.setText(phone);
+               // profile_img.setImageURI(Uri.parse(projects.getImgURL()));
+                Picasso.get().load(img)
+                        .fit()
+                        .centerCrop()
+                        .into(profile_img);
             }
 
             @Override
@@ -170,7 +180,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.user_signout:
                 mAuth.signOut();
-                startActivity(new Intent(ProfileActivity.this, LoginActivity.class));
+                startActivity(new Intent(ProfileActivity.this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+
                 Toast.makeText(ProfileActivity.this, "Signed Out", Toast.LENGTH_SHORT).show();
                 break;
         }

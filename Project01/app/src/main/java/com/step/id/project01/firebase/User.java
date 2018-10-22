@@ -2,7 +2,7 @@ package com.step.id.project01.firebase;
 
 public class User {
     private String id,name,email,phone;
-    //private String imgURL;
+    private String imgURL;
 
     public User(){
 
@@ -41,10 +41,19 @@ public class User {
         this.phone = phone;
     }
 
-    public User(String id, String name, String email, String phone) {
+    public String getImgURL() {
+        return imgURL;
+    }
+
+    public void setImgURL(String imgURL) {
+        this.imgURL = imgURL;
+    }
+
+    public User(String id, String name, String email, String phone, String imgURL) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
+        this.imgURL = imgURL;
     }
 }

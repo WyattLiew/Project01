@@ -630,8 +630,6 @@ public class projectAddOn extends AppCompatActivity {
                                 DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects Add On");
 
                                 ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID, selectedImage, noteString, projectDate, mProjectStatus);
-                                StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
-                                imageRef.delete();
 
                                 databaseNewProject.child(selectedID).child(selectedProjectID).setValue(newProjectProvider);
 

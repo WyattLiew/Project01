@@ -6,8 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.step.id.project01.R;
 import com.step.id.project01.firebase.User;
 
@@ -39,14 +41,14 @@ public class MonitorUserAdapter extends RecyclerView.Adapter <MonitorUserAdapter
 
         holder.tv_Name.setText(mData.get(i).getName());
         holder.tv_Email.setText(mData.get(i).getEmail());
-        /**
+
         if(mData.get(i).getImgURL()!=null) {
             Picasso.get().load(mData.get(i).getImgURL())
                     .fit()
                     .centerCrop()
                     .into(holder.tv_image);
         }
-         **/
+
 
     }
 
@@ -57,12 +59,12 @@ public class MonitorUserAdapter extends RecyclerView.Adapter <MonitorUserAdapter
 
     public static class monitorUserViewHolder extends RecyclerView.ViewHolder{
         private TextView tv_Name,tv_Email;
-       // private ImageView tv_image;
+        private ImageView tv_image;
 
         public monitorUserViewHolder(View itemView){
             super(itemView);
 
-            //tv_image = (ImageView) itemView.findViewById(R.id.monitorUserImage);
+            tv_image = (ImageView) itemView.findViewById(R.id.monitorUserImage);
             tv_Name = (TextView) itemView.findViewById(R.id.monitorUserName);
             tv_Email = (TextView) itemView.findViewById(R.id.monitorUserEmail);
         }
