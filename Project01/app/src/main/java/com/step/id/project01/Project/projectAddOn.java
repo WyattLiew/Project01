@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -54,7 +53,6 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.step.id.project01.R;
 import com.step.id.project01.model.ProjectAddOnProvider;
-import com.step.id.project01.sqlitedata.ProjectDbHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,11 +67,9 @@ public class projectAddOn extends AppCompatActivity {
 
     private static final String TAG = "projectAddOn";
 
-    EditText mProjectAddOnNotes;
-    TextView mProjectAddOnDate;
-    SQLiteDatabase sqLiteDatabase;
-    ProjectDbHelper mDbHelper;
-    ProgressBar progressBar;
+    private EditText mProjectAddOnNotes;
+    private TextView mProjectAddOnDate;
+    private ProgressBar progressBar;
 
     //update data
     private String selectednotes, selectedprojDate, reportMessage;
@@ -175,8 +171,6 @@ public class projectAddOn extends AppCompatActivity {
     }
 
     public void initId() {
-
-        mDbHelper = new ProjectDbHelper(this);
 
         mProjectAddOnNotes = (EditText) findViewById(R.id.projectAddOnNotes);
         mProjectAddOnDate = (TextView) findViewById(R.id.projectAddOnDate);
@@ -646,7 +640,7 @@ public class projectAddOn extends AppCompatActivity {
                 builder_add.show();
                 return true;
             case R.id.action_update:
-                final CharSequence[] items_update = {"Update and Email","Update", "Cancel"};
+                final CharSequence[] items_update = {"Update and Email", "Update", "Cancel"};
                 AlertDialog.Builder builder_update = new AlertDialog.Builder(projectAddOn.this);
                 builder_update.setTitle("Select options");
                 builder_update.setItems(items_update, new DialogInterface.OnClickListener() {
@@ -704,7 +698,7 @@ public class projectAddOn extends AppCompatActivity {
                                 intent.putExtra("projectID", selectedID);
                                 startActivity(intent);
                             }
-                        }else if(items_update[which].equals("Update and Email")){
+                        } else if (items_update[which].equals("Update and Email")) {
 
                             progressBar.setVisibility(View.VISIBLE);
                             final String noteString = mProjectAddOnNotes.getText().toString().trim();
@@ -716,7 +710,7 @@ public class projectAddOn extends AppCompatActivity {
                             }
 
                             reportMessage = createReportSummary(mProjectStatus, mProjectAddOnDate.getText().toString(), mProjectAddOnNotes.getText().toString());
-                            Bitmap imgBitmap = ((BitmapDrawable)projectAddOnImage.getDrawable()).getBitmap();
+                            Bitmap imgBitmap = ((BitmapDrawable) projectAddOnImage.getDrawable()).getBitmap();
                             try {
                                 File root = Environment.getExternalStorageDirectory();
                                 if (root.canWrite()) {

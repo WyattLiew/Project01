@@ -9,8 +9,7 @@
 
     <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
     <string name="category_overview">Overview</string>
-    <string name="category_assignedTo">Assigned To</string>
-    <string name="category_descriptions_of_defect_s">Descriptions of defect(s)</string>
+    <string name="category_descriptions_of_defect">Descriptions of defect</string>
 
     <!-- Label for editor menu option to save pending and leave editor [CHAR LIMIT=20] -->
     <string name="action_save">Save</string>
@@ -27,49 +26,22 @@
     <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
     <string name="hint_client_contact">Contact Number</string>
 
-    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
-    <string name="category_projectType">Project Type</string>
-
-    <!-- Label for projectList type of attributes in the editor [CHAR LIMIT=30] -->
-    <string name="project_type1">Project Type 1</string>
-    <string name="project_type2">Project Type 2</string>
-    <string name="project_type3">Project Type 3</string>
-
     <string name="empty_view_title_text">No data found...</string>
     <string name="empty_view_subtitle_text">Get started by adding a project</string>
 
     <!-- Label for projectList pending -->
-    <string name="defect_1">1.</string>
-    <string name="defect_2">2.</string>
-    <string name="defect_3">3.</string>
-    <string name="Pending_comment">Add comments here</string>
-    <string name="project_location">Project location</string>
-    <string name="contact_person">Contact person</string>
-    <string name="contact_number">Contact number</string>
+    <string name="defect">Add defect here</string>
+    <string name="Pending_comment">Add comment here</string>
     <string name="pending_comments">Comments</string>
-    <string name="project_location_text">Project location :</string>
-    <string name="contact_person_text">Contact person :</string>
-    <string name="contact_number_text">Contact number :</string>
-    <string name="project_manager_text">Project manager :</string>
-    <string name="project_manager">project_manager</string>
     <string name="defect_1_text">Defect 1 :</string>
     <string name="none">None</string>
-    <string name="defect_3_text">Defect 3 :</string>
-    <string name="defect_2_text">Defect 2 :</string>
-    <string name="comments_text">Comments :</string>
-    <string name="date_text">Date :</string>
-    <string name="pennding_date">Date</string>
-    <string name="project_manager_hint">Project manager</string>
 
     <!--
     For report summary projectEditor.java
     -->
     <string name="report_summary_location">Project location: <xliff:g example="Singapore" id="location">%s</xliff:g></string>
-    <string name="report_summary_projManager">Project manager: <xliff:g example="Abang" id="projManager">%s</xliff:g></string>
     <string name="report_summary_date">Inspection date: <xliff:g example="11/12/2018" id="date">%s</xliff:g></string>
     <string name="report_summary_defect_1">1. <xliff:g example="issues" id="defect1">%s</xliff:g></string>
-    <string name="report_summary_defect_2">2. <xliff:g example="issues" id="defect2">%s</xliff:g></string>
-    <string name="report_summary_defect_3">3. <xliff:g example="issues" id="defect3">%s</xliff:g></string>
     <string name="report_summary_comments">Comments: <xliff:g example="comments" id="comment">%s</xliff:g></string>
     <string name="report_summary_Thank_you">Thank you</string>
     <string name="report_summary_description">Description of defect(s) : </string>
@@ -100,7 +72,6 @@
     <string name="cancel">No</string>
 
     <string name="starts_on">Starts on</string>
-    <string name="select_a_date">Select a date</string>
 
     <!-- Label for projectList type of attributes in the Spinner -->
     <string name="projectAddOn_completed">Completed</string>
@@ -109,5 +80,9 @@
 
 
     <string name="action_add_on">Action Add On</string>
+    <string name="select_a_date">select a date</string>
+    <string name="contact_person">contact_person</string>
+    <string name="project_location">project_location</string>
+    <string name="contact_number">contact_number</string>
 
 </resources>

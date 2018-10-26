@@ -12,6 +12,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -26,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.step.id.project01.firebase.Client;
 import com.step.id.project01.sqlitedata.ProjectDbHelper;
 import com.step.id.project01.sqlitedata.newProjectProvider;
 
@@ -33,12 +35,12 @@ import java.util.Calendar;
 
 public class projectEditor extends AppCompatActivity {
 
-    private EditText mProjectLocation, mContactName, mContactNumber, mProjectTitle, mProjectDescription, mProjectNotes;
+    private EditText mProjectLocation, mContactName, mContactNumber, mContactEmail, mProjectTitle, mProjectDescription, mProjectNotes;
 
     // update data
-    private String selectedLocation, selectednotes, selectedName, selectedNum, selectedprojDate, selectedTitle, selectedDescription;
+    private String selectedLocation, selectednotes, selectedName, selectedNum,selectedEmail, selectedprojDate, selectedTitle, selectedDescription;
     private int HideMenu;
-    private String selectedID;
+    private String selectedID,selectedClientID;
     private boolean HIDE_MENU = false;
 
     ProjectDbHelper mDbHelper;
@@ -49,7 +51,7 @@ public class projectEditor extends AppCompatActivity {
     String date = "Select a date";
 
     //Firebase
-    DatabaseReference databaseNewProject;
+    DatabaseReference databaseNewProject, databaseNewClient;
 
     //Warn the user about unsaved changes
     private boolean mPendingHasChanged = false;
@@ -77,6 +79,7 @@ public class projectEditor extends AppCompatActivity {
         initCheckUnsavedChanges();
 
         databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects");
+        databaseNewClient = FirebaseDatabase.getInstance().getReference("Clients");
     }
 
     private void initDate() {
@@ -114,6 +117,7 @@ public class projectEditor extends AppCompatActivity {
         mProjectDescription = (EditText) findViewById(R.id.projDescription);
         mContactName = (EditText) findViewById(R.id.conName);
         mContactNumber = (EditText) findViewById(R.id.conNum);
+        mContactEmail = (EditText) findViewById(R.id.conEmail);
         mProjectLocation = (EditText) findViewById(R.id.projLocation);
         mProjectNotes = (EditText) findViewById(R.id.projNotes);
 
@@ -158,6 +162,7 @@ public class projectEditor extends AppCompatActivity {
                             String conNameString = mContactName.getText().toString().trim();
                             String conNumString = mContactNumber.getText().toString().trim();
                             // int conNumInt = Integer.parseInt(conNumString);
+                            String conEmailString = mContactEmail.getText().toString().trim();
                             String descriptionString = mProjectDescription.getText().toString().trim();
                             String titleString = mProjectTitle.getText().toString().trim();
                             String noteString = mProjectNotes.getText().toString().trim();
@@ -166,23 +171,32 @@ public class projectEditor extends AppCompatActivity {
                                 checkEmptyEditText(locationString, conNameString, conNumString, titleString);
                             } else if (projectDate.matches(date)) {
                                 Toast.makeText(projectEditor.this, "Please select a date.", Toast.LENGTH_SHORT).show();
+                            } else if (conEmailString.isEmpty()) {
+                                mContactEmail.setError("Email is required");
+                                mContactEmail.requestFocus();
+                            } else if (!Patterns.EMAIL_ADDRESS.matcher(conEmailString).matches()) {
+                                mContactEmail.setError("Please enter a valid email");
+                                mContactEmail.requestFocus();
                             } else {
                                 String id = databaseNewProject.push().getKey();
                                 String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                String cid = databaseNewClient.push().getKey();
 
-                                newProjectProvider newProjectProvider = new newProjectProvider(id,titleString,descriptionString,conNameString,conNumString,projectDate,locationString,noteString);
+                                newProjectProvider newProjectProvider = new newProjectProvider(id, titleString, descriptionString, conNameString, conNumString,conEmailString, projectDate, locationString, noteString,cid);
+                                Client client = new Client(cid, conNameString, conNumString, conEmailString, locationString);
                                 databaseNewProject.child(UID).child(id).setValue(newProjectProvider).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
-                                            Toast.makeText(getApplicationContext(),"Project added",Toast.LENGTH_SHORT).show();
-                                        }else{
-                                            Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(getApplicationContext(), "Project added", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
+                                databaseNewClient.child(cid).setValue(client);
 
-                               // mDbHelper.insert_project(locationString, conNameString, conNumString, projectDate, descriptionString, titleString, noteString);
+                                // mDbHelper.insert_project(locationString, conNameString, conNumString, projectDate, descriptionString, titleString, noteString);
                                 Intent intent = new Intent(projectEditor.this, MainActivity.class);
                                 startActivity(intent);
                             }
@@ -205,6 +219,7 @@ public class projectEditor extends AppCompatActivity {
                             String conNameString = mContactName.getText().toString().trim();
                             String conNumString = mContactNumber.getText().toString().trim();
                             //int conNumInt = Integer.parseInt(conNumString);
+                            String conEmailString = mContactEmail.getText().toString().trim();
                             String descriptionString = mProjectDescription.getText().toString().trim();
                             String titleString = mProjectTitle.getText().toString().trim();
                             String noteString = mProjectNotes.getText().toString().trim();
@@ -213,9 +228,15 @@ public class projectEditor extends AppCompatActivity {
                                 checkEmptyEditText(locationString, conNameString, conNumString, titleString);
                             } else if (projectDate.matches(date)) {
                                 Toast.makeText(projectEditor.this, "Please select a date.", Toast.LENGTH_SHORT).show();
+                            } else if (conEmailString.isEmpty()) {
+                                mContactEmail.setError("Email is required");
+                                mContactEmail.requestFocus();
+                            } else if (!Patterns.EMAIL_ADDRESS.matcher(conEmailString).matches()) {
+                                mContactEmail.setError("Please enter a valid email");
+                                mContactEmail.requestFocus();
                             } else {
 
-                                updateProject(selectedID,titleString,descriptionString,conNameString,conNumString,projectDate,locationString,noteString);
+                                updateProject(selectedID, selectedClientID,titleString, descriptionString, conNameString, conNumString,conEmailString, projectDate, locationString, noteString);
                                 Intent intent = new Intent(projectEditor.this, MainActivity.class);
                                 startActivity(intent);
                             }
@@ -267,6 +288,7 @@ public class projectEditor extends AppCompatActivity {
         selectedLocation = receivedIntent.getStringExtra("location");
         selectedName = receivedIntent.getStringExtra("conName");
         selectedNum = receivedIntent.getStringExtra("conNum");
+        selectedEmail = receivedIntent.getStringExtra("conEmail");
         selectedTitle = receivedIntent.getStringExtra("title");
         selectedDescription = receivedIntent.getStringExtra("description");
         selectednotes = receivedIntent.getStringExtra("notes");
@@ -276,6 +298,7 @@ public class projectEditor extends AppCompatActivity {
             selectedprojDate = receivedIntent.getStringExtra("date");
             mDisplayDate.setText(selectedprojDate);
             selectedID = receivedIntent.getStringExtra("projectID");
+            selectedClientID = receivedIntent.getStringExtra("clientID");
         }
 
 
@@ -285,6 +308,7 @@ public class projectEditor extends AppCompatActivity {
         mProjectTitle.setText(selectedTitle);
         mProjectDescription.setText(selectedDescription);
         mProjectNotes.setText(selectednotes);
+        mContactEmail.setText(selectedEmail);
 
 
         // Hide save menu
@@ -293,20 +317,22 @@ public class projectEditor extends AppCompatActivity {
         }
     }
 
-    private boolean updateProject(String id, String titleString,String descriptionString,String conNameString,String conNumString,String projectDate,String locationString,String noteString){
-        DatabaseReference databaseNewProject= FirebaseDatabase.getInstance().getReference("Projects");
+    private boolean updateProject(String id, String clientID,String titleString, String descriptionString, String conNameString, String conNumString,String conEmailString, String projectDate, String locationString, String noteString) {
+        DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects");
         String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference databaseNewClientRef = FirebaseDatabase.getInstance().getReference("Clients");
 
-        newProjectProvider newProjectProvider = new newProjectProvider(id,titleString,descriptionString,conNameString,conNumString,projectDate,locationString,noteString);
-
+        newProjectProvider newProjectProvider = new newProjectProvider(id, titleString, descriptionString, conNameString, conNumString,conEmailString, projectDate, locationString, noteString,clientID);
+        Client client = new Client(clientID,conNameString,conNumString,conEmailString,locationString);
         databaseNewProject.child(UID).child(id).setValue(newProjectProvider);
+        databaseNewClientRef.child(clientID).setValue(client);
 
-        Toast.makeText(this,"Project Updated Successfully",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
 
         return true;
     }
 
-    private void deleteProject(String selectedID){
+    private void deleteProject(String selectedID) {
         String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference deleteProject = FirebaseDatabase.getInstance().getReference("Projects");
         DatabaseReference deleteProjectAddOn = FirebaseDatabase.getInstance().getReference("Projects Add On");
@@ -314,7 +340,7 @@ public class projectEditor extends AppCompatActivity {
         deleteProject.child(UID).child(selectedID).removeValue();
         deleteProjectAddOn.child(selectedID).removeValue();
 
-        Toast.makeText(this,"Project is deleted",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Project is deleted", Toast.LENGTH_SHORT).show();
     }
 
     public void initCheckUnsavedChanges() {
@@ -325,6 +351,7 @@ public class projectEditor extends AppCompatActivity {
         mProjectDescription.setOnTouchListener(mTouchListener);
         mProjectTitle.setOnTouchListener(mTouchListener);
         mDisplayDate.setOnTouchListener(mTouchListener);
+        mContactEmail.setOnTouchListener(mTouchListener);
     }
 
     private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener) {

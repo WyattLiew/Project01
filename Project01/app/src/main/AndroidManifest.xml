@@ -37,12 +37,9 @@
             android:largeHeap="true"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".defectEditor"
+            android:name=".Defect.defectAddOn"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Defect Editor">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".projectEditor"
@@ -53,8 +50,21 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".defectEditor"
+            android:label="Defect Editor">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity android:name=".Defect.defectList"
+            android:label="Defect List">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
             android:name=".Project.projectList"
-            android:label="Project List">
+            android:label="Progress List">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -89,8 +99,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-        <activity android:name=".ForgotPasswordActivity"
+        <activity
+            android:name=".ForgotPasswordActivity"
             android:label="Forgot Password">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

@@ -42,6 +42,7 @@ public class projectRecyclerAdapter extends RecyclerView.Adapter<projectRecycler
         holder.tv_description.setText(mData.get(position).getDescription());
         holder.tv_conName.setText(mData.get(position).getName());
         holder.tv_conNum.setText(mData.get(position).getNumber());
+        holder.tv_conEmail.setText(mData.get(position).getEmail());
         holder.tv_location.setText(mData.get(position).getLocation());
         holder.tv_date.setText(mData.get(position).getDate());
         holder.tv_notes.setText(mData.get(position).getNotes());
@@ -55,7 +56,7 @@ public class projectRecyclerAdapter extends RecyclerView.Adapter<projectRecycler
 
     public static class projectViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView tv_title, tv_description, tv_conName, tv_conNum,tv_location,tv_date,tv_notes;
+        private TextView tv_title, tv_description, tv_conName, tv_conNum,tv_conEmail,tv_location,tv_date,tv_notes;
 
         public projectViewHolder(View itemView){
             super(itemView);
@@ -64,6 +65,7 @@ public class projectRecyclerAdapter extends RecyclerView.Adapter<projectRecycler
             tv_description = (TextView) itemView.findViewById(R.id.lg_projDescription_textView);
             tv_conName = (TextView) itemView.findViewById(R.id.lg_projConName_textView);
             tv_conNum = (TextView) itemView.findViewById(R.id.lg_projNumber_textView);
+            tv_conEmail = (TextView)itemView.findViewById(R.id.lg_conEmail_textView);
             tv_location = (TextView) itemView.findViewById(R.id.lg_projLocation_textView);
             tv_date = (TextView) itemView.findViewById(R.id.lg_projDate_textView);
             tv_notes = (TextView) itemView.findViewById(R.id.lg_projNotes_textView);

@@ -1,35 +1,42 @@
 package com.step.id.project01;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.step.id.project01.sqlitedata.DataProvider;
-import com.step.id.project01.sqlitedata.ProjectDbHelper;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.step.id.project01.Defect.defectList;
+import com.step.id.project01.RecyclerView.RecyclerTouchListener;
+import com.step.id.project01.RecyclerView.pendingRecyclerAdapter;
+import com.step.id.project01.model.Pending;
 
-import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 
 public class tab3_pending extends Fragment {
 
-    ListView listView;
-    SQLiteDatabase sqLiteDatabase;
-    ProjectDbHelper projectDbHelper;
-    Cursor cursor;
-    ListAdapter listAdapter;
     private static final String TAG = "tab3_pending";
+    private static final String pendingID = "pendingID";
+
+    private pendingRecyclerAdapter pendingRecyclerAdapter;
+    private View emptyView;
+    private RecyclerView pendingRecyclerView;
+    private ArrayList<Pending> listNewPending = new ArrayList<>();
+
+    //Firebasse
+    DatabaseReference databaseNewPending, pendingRef;
 
 
     @Override
@@ -37,114 +44,95 @@ public class tab3_pending extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.tab3_pending, container, false);
 
-        listView = (ListView) rootView.findViewById(R.id.pending_list);
+        pendingRecyclerView = (RecyclerView) rootView.findViewById(R.id.pending_recyclerView);
+        pendingRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        pendingRecyclerView.setHasFixedSize(true);
 
-        // Only display without data
-        View emptyView = rootView.findViewById(R.id.empty_view);
-        listView.setEmptyView(emptyView);
-
-        projectDbHelper = new ProjectDbHelper(getActivity().getApplicationContext());
-        sqLiteDatabase = projectDbHelper.getReadableDatabase();
-        cursor = projectDbHelper.viewData();
-        listAdapter = new ListAdapter(getActivity().getApplicationContext(), R.layout.item_project);
-        listAdapter.notifyDataSetChanged();
-        listView.setAdapter(listAdapter);
-        listView.invalidateViews();
+        emptyView = rootView.findViewById(R.id.pending_empty_view);
+        databaseNewPending = FirebaseDatabase.getInstance().getReference();
+        pendingRef = databaseNewPending.child("Pending").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
 
-        // Cursor data
-        initData();
+        onRetrieve();
 
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        pendingRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), pendingRecyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String rowID = ((TextView) view.findViewById(R.id.project_id)).getText().toString();
-                String pos = ((TextView) view.findViewById(R.id.project_location)).getText().toString();
-                String conName = ((TextView) view.findViewById(R.id.project_person)).getText().toString();
-                String conNum = ((TextView) view.findViewById(R.id.project_number)).getText().toString();
-                String projManager = ((TextView) view.findViewById(R.id.project_manager)).getText().toString();
-                String projectDate = ((TextView) view.findViewById(R.id.project_date)).getText().toString();
-                String defect1 = ((TextView) view.findViewById(R.id.project_defect_1)).getText().toString();
-                String defect2 = ((TextView) view.findViewById(R.id.project_defect_2)).getText().toString();
-                String defect3 = ((TextView) view.findViewById(R.id.project_defect_3)).getText().toString();
-                String comments = ((TextView) view.findViewById(R.id.project_comment)).getText().toString();
-                //Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.id.project_image);
+            public void onClick(View view, int position) {
+                String rowid = listNewPending.get(position).getId();
+                Log.d(TAG, "The row id is: " + rowid);
+                Intent intent = new Intent(getActivity().getApplicationContext(), defectList.class);
+                intent.putExtra(pendingID, listNewPending.get(position).getId());
+                intent.putExtra("Title",listNewPending.get(position).getTitle());
+                Log.d(TAG, "The tab 2 row id is: " + rowid);
+                startActivity(intent);
+            }
 
-                ImageView projImage = (ImageView) view.findViewById(R.id.project_image);
-                projImage.setDrawingCacheEnabled(true);
-                projImage.buildDrawingCache();
-                final Bitmap bitmap = projImage.getDrawingCache();
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] bytes = stream.toByteArray();
+            @Override
+            public void onLongClick(View view, int position) {
+
+                String rowid = listNewPending.get(position).getId();
+                String title = listNewPending.get(position).getTitle();
+                String description = listNewPending.get(position).getDescription();
+                String conName = listNewPending.get(position).getName();
+                String conNum = listNewPending.get(position).getNumber();
+                String conEmail = listNewPending.get(position).getEmail();
+                String location = listNewPending.get(position).getLocation();
+                String date = listNewPending.get(position).getDate();
+                String notes = listNewPending.get(position).getNotes();
 
                 int HideMenu = 1;
+                Log.d(TAG, "The row id is: " + rowid);
 
-                Cursor data = projectDbHelper.getItemID(rowID); //get the id associated with that name
-                Toast.makeText(getActivity(),"This row id is: "+rowID,Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity().getApplicationContext(), defectEditor.class);
+                intent.putExtra(pendingID, rowid);
+                intent.putExtra("Title", title);
+                intent.putExtra("description", description);
+                intent.putExtra("conName", conName);
+                intent.putExtra("conNum", conNum);
+                intent.putExtra("conEmail", conEmail);
+                intent.putExtra("location", location);
+                intent.putExtra("date", date);
+                intent.putExtra("notes", notes);
+                intent.putExtra("HideMenu", HideMenu);
+                Log.d(TAG, "The row id is: " + rowid);
+                startActivity(intent);
+            }
 
-                int itemID = -1;
-                while (data.moveToNext()) {
-                    itemID = data.getInt(0);
+        }));
+
+        return rootView;
+    }
+
+    public void onRetrieve() {
+
+        pendingRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                listNewPending.clear();
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Pending projects = dataSnapshot1.getValue(Pending.class);
+                    listNewPending.add(projects);
                 }
-                if (itemID > -1) {
-                    Log.d(TAG, "onItemClick: The ID is: " + itemID);
-                    Intent editScreenIntent = new Intent(getActivity(), defectEditor.class);
-                    editScreenIntent.putExtra("id", +itemID);
-                    editScreenIntent.putExtra("location", pos);
-                    editScreenIntent.putExtra("conName", conName);
-                    editScreenIntent.putExtra("conNum", conNum);
-                    editScreenIntent.putExtra("projManager", projManager);
-                    editScreenIntent.putExtra("projDate", projectDate);
-                    editScreenIntent.putExtra("defect1", defect1);
-                    editScreenIntent.putExtra("defect2", defect2);
-                    editScreenIntent.putExtra("defect3", defect3);
-                    editScreenIntent.putExtra("comments", comments);
-                    editScreenIntent.putExtra("projImage", bytes);
-                    editScreenIntent.putExtra("HideMenu", HideMenu);
-                    startActivity(editScreenIntent);
+                pendingRecyclerAdapter = new pendingRecyclerAdapter(getActivity(), listNewPending);
+                pendingRecyclerView.setAdapter(pendingRecyclerAdapter);
+
+                if (listNewPending.isEmpty()) {
+                    pendingRecyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                } else {
+                    pendingRecyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
 
-        return rootView;
-
     }
-
-    public void initData(){
-        if (cursor.moveToFirst()) {
-
-            do {
-                String location, name, number, projManager, projectDate, defect1, defect2, defect3, comments;
-                String rowId;
-                byte[] img;
-                rowId = cursor.getString(0);
-                name = cursor.getString(1);
-                location = cursor.getString(2);
-                number = cursor.getString(3);
-                projManager = cursor.getString(4);
-                projectDate = cursor.getString(5);
-                defect1 = cursor.getString(6);
-                defect2 = cursor.getString(7);
-                defect3 = cursor.getString(8);
-                comments = cursor.getString(9);
-                img = cursor.getBlob(10);
-                DataProvider dataProvider = new DataProvider(rowId, location, name, number, projManager, projectDate, defect1, defect2, defect3, comments, img);
-                listAdapter.add(dataProvider);
-                listAdapter.notifyDataSetChanged();
-                listView.invalidateViews();
-                Log.d(TAG, "The row id is :   " + rowId);
-            }
-            while (cursor.moveToNext());
-            listAdapter.notifyDataSetChanged();
-            listView.invalidateViews();
-
-        }
-
-    }
-
 }
 
 

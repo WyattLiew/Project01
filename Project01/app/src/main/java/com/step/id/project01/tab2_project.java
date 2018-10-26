@@ -58,6 +58,7 @@ public class tab2_project extends Fragment {
         databaseNewProject = FirebaseDatabase.getInstance().getReference();
         projectsRef = databaseNewProject.child("Projects").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+
         onRetrieve();
 
         projectRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity().getApplicationContext(), projectRecyclerView, new RecyclerTouchListener.ClickListener() {
@@ -66,7 +67,7 @@ public class tab2_project extends Fragment {
                 String rowid = listNewProjectProviders.get(position).getId();
                 Log.d(TAG, "The row id is: " + rowid);
                 Intent intent = new Intent(getActivity().getApplicationContext(), projectList.class);
-                intent.putExtra(projectID,listNewProjectProviders.get(position).getId());
+                intent.putExtra(projectID, listNewProjectProviders.get(position).getId());
                 Log.d(TAG, "The tab 2 row id is: " + rowid);
                 startActivity(intent);
 
@@ -81,30 +82,33 @@ public class tab2_project extends Fragment {
                 String description = listNewProjectProviders.get(position).getDescription();
                 String conName = listNewProjectProviders.get(position).getName();
                 String conNum = listNewProjectProviders.get(position).getNumber();
+                String conEmail = listNewProjectProviders.get(position).getEmail();
                 String location = listNewProjectProviders.get(position).getLocation();
                 String date = listNewProjectProviders.get(position).getDate();
                 String notes = listNewProjectProviders.get(position).getNotes();
+                String clientID = listNewProjectProviders.get(position).getClientID();
 
                 int HideMenu = 1;
                 Log.d(TAG, "The row id is: " + rowid);
 
                 Intent intent = new Intent(getActivity().getApplicationContext(), projectEditor.class);
-                intent.putExtra(projectID,rowid);
+                intent.putExtra(projectID, rowid);
                 intent.putExtra("title", title);
                 intent.putExtra("description", description);
                 intent.putExtra("conName", conName);
                 intent.putExtra("conNum", conNum);
+                intent.putExtra("conEmail", conEmail);
                 intent.putExtra("location", location);
                 intent.putExtra("date", date);
                 intent.putExtra("notes", notes);
                 intent.putExtra("HideMenu", HideMenu);
+                intent.putExtra("clientID", clientID);
                 Log.d(TAG, "The row id is: " + rowid);
                 startActivity(intent);
             }
 
 
         }));
-
 
 
         return rootView;

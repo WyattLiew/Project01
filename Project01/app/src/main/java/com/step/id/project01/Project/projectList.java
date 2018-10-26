@@ -1,8 +1,6 @@
 package com.step.id.project01.Project;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -21,7 +19,6 @@ import com.step.id.project01.R;
 import com.step.id.project01.RecyclerView.RecyclerTouchListener;
 import com.step.id.project01.RecyclerView.projectAddOnAdapter;
 import com.step.id.project01.model.ProjectAddOnProvider;
-import com.step.id.project01.sqlitedata.ProjectDbHelper;
 
 import java.util.ArrayList;
 
@@ -31,10 +28,7 @@ public class projectList extends AppCompatActivity {
 
     private String selectedID;
 
-    private SQLiteDatabase sqLiteDatabase;
-    private ProjectDbHelper projectDbHelper;
     private projectAddOnAdapter projectAddOnAdapter;
-    private Cursor cursor;
     private View emptyView;
     private RecyclerView projectRecyclerView;
     private ArrayList<ProjectAddOnProvider> listNewProjectProviders = new ArrayList<>();
