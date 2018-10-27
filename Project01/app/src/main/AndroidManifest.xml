@@ -27,7 +27,6 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -39,8 +38,7 @@
         <activity
             android:name=".Defect.defectAddOn"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="Defect Editor">
-        </activity>
+            android:label="Defect Editor" />
         <activity
             android:name=".projectEditor"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -56,7 +54,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".Defect.defectList"
+        <activity
+            android:name=".Defect.defectList"
             android:label="Defect List">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -92,6 +91,15 @@
         <activity
             android:name=".MonitorProjectAddOnActivity"
             android:label="Project Add On" />
+        <activity android:name=".MonitorDefectActivity"
+            android:label="Defect List">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MonitorUserActivity" />
+        </activity>
+        <activity android:name=".MonitorDefectAddOnActivity"
+            android:label="Defect Add On">
+        </activity>
         <activity
             android:name=".ProfileActivity"
             android:label="My profile">

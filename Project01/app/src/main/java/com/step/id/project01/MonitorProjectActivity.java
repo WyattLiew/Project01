@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class MonitorProjectActivity extends AppCompatActivity {
 
-    private static final String TAG = "tab2_project";
+    private static final String TAG = "Monitor_projectActivity";
     private static final String projectID = "projectID";
     private String selectedID;
 

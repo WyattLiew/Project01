@@ -1,12 +1,13 @@
 package com.step.id.project01;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.google.firebase.database.DataSnapshot;
@@ -53,13 +54,30 @@ public class MonitorUserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
 
+               final String rowid = listUser.get(position).getId();
 
-                String rowid = listUser.get(position).getId();
-                Log.d(TAG, "The row id is: " + rowid);
-                Intent intent = new Intent(MonitorUserActivity.this, MonitorProjectActivity.class);
-                intent.putExtra(userID,rowid);
-                Log.d(TAG, "The tab 2 row id is: " + rowid);
-                startActivity(intent);
+                final CharSequence[] items_add = {"Projects", "Defects","Cancel"};
+                AlertDialog.Builder builder_add = new AlertDialog.Builder(MonitorUserActivity.this);
+                builder_add.setTitle("Select options");
+                builder_add.setItems(items_add, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (items_add[which].equals("Projects")) {
+
+                            Intent intent = new Intent(MonitorUserActivity.this, MonitorProjectActivity.class);
+                            intent.putExtra(userID,rowid);
+                            startActivity(intent);
+
+                        } else if (items_add[which].equals("Defects")) {
+                            Intent intent = new Intent(MonitorUserActivity.this, MonitorDefectActivity.class);
+                            intent.putExtra(userID,rowid);
+                            startActivity(intent);
+                        }else{
+                            dialog.dismiss();
+                        }
+                    }
+                });
+                builder_add.show();
             }
 
             @Override
