@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +24,7 @@ public class MonitorProjectAddOnActivity extends AppCompatActivity {
 
     private static final String TAG = "projectList";
 
-    private String selectedID,userID;
+    private String selectedID,selectedTitle,userID;
     private com.step.id.project01.RecyclerView.projectAddOnAdapter projectAddOnAdapter;
     private View emptyView;
     private RecyclerView projectRecyclerView;
@@ -52,7 +51,7 @@ public class MonitorProjectAddOnActivity extends AppCompatActivity {
         Intent intent = getIntent();
         userID = intent.getStringExtra("UID");
         selectedID = intent.getStringExtra("projectID");
-        Log.d(TAG, "project List Selected ID is: " + selectedID);
+        selectedTitle = intent.getStringExtra("title");
 
         databaseNewProject = FirebaseDatabase.getInstance().getReference();
         projectsRef = databaseNewProject.child("Projects Add On").child(selectedID);

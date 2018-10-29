@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class projectList extends AppCompatActivity {
     private static final String TAG = "projectList";
 
-    private String selectedID;
+    private String selectedID,selectedTitle;
 
     private projectAddOnAdapter projectAddOnAdapter;
     private View emptyView;
@@ -47,7 +47,7 @@ public class projectList extends AppCompatActivity {
 
         Intent intent = getIntent();
         selectedID = intent.getStringExtra("projectID");
-        Log.d(TAG, "project List Selected ID is: " + selectedID);
+        selectedTitle = intent.getStringExtra("title");
 
         databaseNewProject = FirebaseDatabase.getInstance().getReference();
         projectsRef = databaseNewProject.child("Projects Add On").child(selectedID);
@@ -63,6 +63,7 @@ public class projectList extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(projectList.this, projectAddOn.class);
                 intent.putExtra("projectID", selectedID);
+                intent.putExtra("title", selectedTitle);
                 startActivity(intent);
             }
         });
@@ -86,6 +87,7 @@ public class projectList extends AppCompatActivity {
                     intent.putExtra("projImage", listNewProjectProviders.get(position).getImgURL());
                     intent.putExtra("status", status);
                     intent.putExtra("date", date);
+                    intent.putExtra("title", selectedTitle);
                     intent.putExtra("notes", notes);
                     intent.putExtra("HideMenu", HideMenu);
                     Log.d(TAG, "The row id is: " + rowid);

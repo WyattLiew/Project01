@@ -14,8 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
-import com.step.id.project01.sqlitedata.ProjectDbHelper;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    ProjectDbHelper mDbHelper;
 
     Button button;
 
@@ -57,11 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
-
-        mDbHelper = new ProjectDbHelper(this);
-
-
 
     }
 

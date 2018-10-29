@@ -29,7 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.step.id.project01.firebase.Client;
 import com.step.id.project01.sqlitedata.ProjectDbHelper;
-import com.step.id.project01.sqlitedata.newProjectProvider;
+import com.step.id.project01.model.newProjectProvider;
 
 import java.util.Calendar;
 

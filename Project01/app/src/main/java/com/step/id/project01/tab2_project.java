@@ -1,8 +1,6 @@
 package com.step.id.project01;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -22,8 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.step.id.project01.Project.projectList;
 import com.step.id.project01.RecyclerView.RecyclerTouchListener;
 import com.step.id.project01.RecyclerView.projectRecyclerAdapter;
-import com.step.id.project01.sqlitedata.ProjectDbHelper;
-import com.step.id.project01.sqlitedata.newProjectProvider;
+import com.step.id.project01.model.newProjectProvider;
 
 import java.util.ArrayList;
 
@@ -32,10 +29,7 @@ public class tab2_project extends Fragment {
     private static final String TAG = "tab2_project";
     private static final String projectID = "projectID";
 
-    private SQLiteDatabase sqLiteDatabase;
-    private ProjectDbHelper projectDbHelper;
     private projectRecyclerAdapter projectRecyclerAdapter;
-    private Cursor cursor;
     private View emptyView;
     private RecyclerView projectRecyclerView;
     private ArrayList<newProjectProvider> listNewProjectProviders = new ArrayList<>();
@@ -68,6 +62,7 @@ public class tab2_project extends Fragment {
                 Log.d(TAG, "The row id is: " + rowid);
                 Intent intent = new Intent(getActivity().getApplicationContext(), projectList.class);
                 intent.putExtra(projectID, listNewProjectProviders.get(position).getId());
+                intent.putExtra("title",listNewProjectProviders.get(position).getTitle());
                 Log.d(TAG, "The tab 2 row id is: " + rowid);
                 startActivity(intent);
 

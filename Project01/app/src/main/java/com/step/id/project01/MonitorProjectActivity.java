@@ -16,7 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.step.id.project01.RecyclerView.RecyclerTouchListener;
 import com.step.id.project01.RecyclerView.projectRecyclerAdapter;
-import com.step.id.project01.sqlitedata.newProjectProvider;
+import com.step.id.project01.model.newProjectProvider;
 
 import java.util.ArrayList;
 
@@ -58,11 +58,10 @@ public class MonitorProjectActivity extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
                 String rowid = listNewProjectProviders.get(position).getId();
-                Log.d(TAG, "The row id is: " + rowid);
                 Intent intent = new Intent(MonitorProjectActivity.this, MonitorProjectAddOnActivity.class);
                 intent.putExtra(projectID, listNewProjectProviders.get(position).getId());
+                intent.putExtra("title",listNewProjectProviders.get(position).getTitle());
                 intent.putExtra("UID",selectedID);
-                Log.d(TAG, "The tab 2 row id is: " + rowid);
                 startActivity(intent);
             }
 

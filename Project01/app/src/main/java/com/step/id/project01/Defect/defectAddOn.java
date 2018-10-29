@@ -49,6 +49,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.step.id.project01.Image.BitmapUtils;
 import com.step.id.project01.R;
 import com.step.id.project01.model.defect;
 
@@ -78,6 +79,7 @@ public class defectAddOn extends AppCompatActivity {
     public static final int REQUEST_PERMISSION = 200;
     String imageFilePath ;
     private Uri selectImageUrl;
+    private Bitmap mResultBitmap;
 
     // report string
     String reportMessage;
@@ -135,7 +137,7 @@ public class defectAddOn extends AppCompatActivity {
 
         mDatabaseAddon = FirebaseDatabase.getInstance().getReference("Defect Add On").child(selectedID);
         mStorage = FirebaseStorage.getInstance();
-        mStorageReference = FirebaseStorage.getInstance().getReference(selectedTitle);
+        mStorageReference = FirebaseStorage.getInstance().getReference("Defect add on").child(selectedTitle);
 
         //Check permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
@@ -227,8 +229,7 @@ public class defectAddOn extends AppCompatActivity {
                 Log.e("Attachment Path:", imageFilePath);
 
                 selectImageUrl = Uri.fromFile(new File(imageFilePath));
-
-                Bitmap imgBitmap = ((BitmapDrawable)projectImage.getDrawable()).getBitmap();
+                mResultBitmap = ((BitmapDrawable)projectImage.getDrawable()).getBitmap();
 
 
                 try {
@@ -236,7 +237,7 @@ public class defectAddOn extends AppCompatActivity {
                     if (root.canWrite()){
                         pic = new File(root, "pic.png");
                         FileOutputStream out = new FileOutputStream(pic);
-                        imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                        mResultBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                         out.flush();
                         out.close();
                     }
@@ -425,7 +426,7 @@ public class defectAddOn extends AppCompatActivity {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 //Create dialog to send email / store data
-                final CharSequence[] items = {"Save and email", "Save only", "Cancel"};
+                final CharSequence[] items = {"Save and email", "Save", "Cancel"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(defectAddOn.this);
                 builder.setTitle("Select options");
                 builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -445,6 +446,8 @@ public class defectAddOn extends AppCompatActivity {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
 
+                                BitmapUtils.saveImage(defectAddOn.this,mResultBitmap);
+
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -456,10 +459,12 @@ public class defectAddOn extends AppCompatActivity {
                                         String id = mDatabaseAddon.push().getKey();
                                         defect defect = new defect(id, downloadUri.toString(),mDefect1.getText().toString(),mProjectDate.getText().toString(),mPendingComment.getText().toString());
                                         mDatabaseAddon.child(id).setValue(defect);
-                                        Intent intent = new Intent(defectAddOn.this, defectList.class);
-                                        intent.putExtra("pendingID", selectedID);
-                                        intent.putExtra("Title",selectedTitle);
-                                        startActivity(intent);
+
+                                        finish();
+                                       // Intent intent = new Intent(defectAddOn.this, defectList.class);
+                                        //intent.putExtra("pendingID", selectedID);
+                                        //intent.putExtra("Title",selectedTitle);
+                                        //startActivity(intent);
                                     }
                                 })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -488,7 +493,7 @@ public class defectAddOn extends AppCompatActivity {
                                 startActivity(emailIntent);
                             }
 
-                        } else if (items[which].equals("Save only")) {
+                        } else if (items[which].equals("Save")) {
                             progressBar.setVisibility(View.VISIBLE);
                             final String projectDate = mProjectDate.getText().toString().trim();
                             final String defect1String = mDefect1.getText().toString().trim();
@@ -507,6 +512,8 @@ public class defectAddOn extends AppCompatActivity {
                            else{
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
+
+                                BitmapUtils.saveImage(defectAddOn.this,mResultBitmap);
 
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
@@ -551,7 +558,7 @@ public class defectAddOn extends AppCompatActivity {
 
             case R.id.action_update:
                 //Create dialog to send email / store data
-                final CharSequence[] items_update = {"Update and email", "Update only", "Cancel"};
+                final CharSequence[] items_update = {"Update and email", "Update", "Cancel"};
                 AlertDialog.Builder builder_update = new AlertDialog.Builder(defectAddOn.this);
                 builder_update.setTitle("Select options");
                 builder_update.setItems(items_update, new DialogInterface.OnClickListener() {
@@ -601,6 +608,8 @@ public class defectAddOn extends AppCompatActivity {
                                     StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                             + "." + getFileExtension(selectImageUrl));
 
+                                    BitmapUtils.saveImage(defectAddOn.this,mResultBitmap);
+
                                     fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -644,7 +653,7 @@ public class defectAddOn extends AppCompatActivity {
                                 }
                             }
 
-                        } else if (items_update[which].equals("Update only")) {
+                        } else if (items_update[which].equals("Update")) {
                             progressBar.setVisibility(View.VISIBLE);
                             final String projectDate = mProjectDate.getText().toString().trim();
                             final String defect1String = mDefect1.getText().toString().trim();
@@ -661,6 +670,8 @@ public class defectAddOn extends AppCompatActivity {
                             if (selectImageUrl != null) {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
+
+                                BitmapUtils.saveImage(defectAddOn.this,mResultBitmap);
 
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
@@ -717,6 +728,7 @@ public class defectAddOn extends AppCompatActivity {
                                 deleteProjectAddOn(selectedDefectID);
                                 Intent intent = new Intent(defectAddOn.this, defectList.class);
                                 intent.putExtra("pendingID", selectedID);
+                                intent.putExtra("tTitle",selectedTitle);
                                 startActivity(intent);
                             }
                         };

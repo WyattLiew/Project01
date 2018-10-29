@@ -116,7 +116,7 @@
                         android:layout_height="wrap_content"
                         android:ems="10"
                         android:inputType="textMultiLine"
-                        android:hint="Notes"/>
+                        android:hint="Notes (Optional)"/>
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 

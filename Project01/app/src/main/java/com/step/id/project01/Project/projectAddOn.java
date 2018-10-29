@@ -53,6 +53,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.step.id.project01.R;
 import com.step.id.project01.model.ProjectAddOnProvider;
+import com.step.id.project01.Image.BitmapUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,7 +76,7 @@ public class projectAddOn extends AppCompatActivity {
     private String selectednotes, selectedprojDate, reportMessage;
     private String selectedImage;
     private int HideMenu;
-    private String selectedID, selectedProjectID, selectedStatus = "Completed";
+    private String selectedID, selectedProjectID,selectedTitle, selectedStatus = "Completed";
     private boolean HIDE_MENU = false;
 
 
@@ -94,6 +95,7 @@ public class projectAddOn extends AppCompatActivity {
     public static final int REQUEST_PERMISSION = 200;
     String imageFilePath;
     private Uri selectImageUrl;
+    private Bitmap mResultBitmap;
 
     // For attach image to email
     File pic;
@@ -128,7 +130,7 @@ public class projectAddOn extends AppCompatActivity {
 
         mDatabaseAddon = FirebaseDatabase.getInstance().getReference("Projects Add On").child(selectedID);
         mStorage = FirebaseStorage.getInstance();
-        mStorageReference = FirebaseStorage.getInstance().getReference("Projects Add On");
+        mStorageReference = FirebaseStorage.getInstance().getReference("Projects Add On").child(selectedTitle);
 
 
         if (getSupportActionBar() != null) {
@@ -240,17 +242,13 @@ public class projectAddOn extends AppCompatActivity {
 
             if (requestCode == REQUEST_CAMERA) {
 
-                //Bundle bundle = data.getExtras();
-                //final Bitmap bmp = (Bitmap) bundle.get("data");
-                //projectImage.setImageBitmap(bmp);
-
                 projectAddOnImage.setImageURI(Uri.parse(imageFilePath));
                 projectAddOnImage.setMinimumHeight(512);
                 Log.e("Attachment Path:", imageFilePath);
 
                 selectImageUrl = Uri.fromFile(new File(imageFilePath));
 
-                Bitmap imgBitmap = ((BitmapDrawable) projectAddOnImage.getDrawable()).getBitmap();
+                mResultBitmap = ((BitmapDrawable) projectAddOnImage.getDrawable()).getBitmap();
 
 
                 try {
@@ -258,7 +256,7 @@ public class projectAddOn extends AppCompatActivity {
                     if (root.canWrite()) {
                         pic = new File(root, "pic.png");
                         FileOutputStream out = new FileOutputStream(pic);
-                        imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                        mResultBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                         out.flush();
                         out.close();
                     }
@@ -381,6 +379,7 @@ public class projectAddOn extends AppCompatActivity {
                 dialog.show();
             }
         });
+
         mDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -394,6 +393,7 @@ public class projectAddOn extends AppCompatActivity {
     public void initUpdate() {
         Intent receivedIntent = getIntent();
         selectedID = receivedIntent.getStringExtra("projectID");
+        selectedTitle = receivedIntent.getStringExtra("title");
         selectednotes = receivedIntent.getStringExtra("notes");
         HideMenu = receivedIntent.getIntExtra("HideMenu", 0);
 
@@ -547,6 +547,9 @@ public class projectAddOn extends AppCompatActivity {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
 
+                                // Save the image
+                                BitmapUtils.saveImage(projectAddOn.this,mResultBitmap);
+
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -560,6 +563,7 @@ public class projectAddOn extends AppCompatActivity {
                                         mDatabaseAddon.child(id).setValue(projectAddOnProvider);
                                         Intent intent = new Intent(projectAddOn.this, projectList.class);
                                         intent.putExtra("projectID", selectedID);
+                                        intent.putExtra("title",selectedTitle);
                                         startActivity(intent);
                                     }
                                 })
@@ -589,6 +593,9 @@ public class projectAddOn extends AppCompatActivity {
                             } else {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
+
+                                BitmapUtils.saveImage(projectAddOn.this,mResultBitmap);
+
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -661,6 +668,8 @@ public class projectAddOn extends AppCompatActivity {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
 
+                                BitmapUtils.saveImage(projectAddOn.this,mResultBitmap);
+
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -696,6 +705,7 @@ public class projectAddOn extends AppCompatActivity {
                                 Toast.makeText(projectAddOn.this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
                                 intent.putExtra("projectID", selectedID);
+                                intent.putExtra("title",selectedTitle);
                                 startActivity(intent);
                             }
                         } else if (items_update[which].equals("Update and Email")) {
@@ -735,6 +745,8 @@ public class projectAddOn extends AppCompatActivity {
                             if (selectImageUrl != null) {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
+
+                                BitmapUtils.saveImage(projectAddOn.this,mResultBitmap);
 
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
@@ -788,6 +800,7 @@ public class projectAddOn extends AppCompatActivity {
                                 deleteProjectAddOn(selectedProjectID);
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
                                 intent.putExtra("projectID", selectedID);
+                                intent.putExtra("title",selectedTitle);
                                 startActivity(intent);
                             }
                         };
@@ -798,6 +811,7 @@ public class projectAddOn extends AppCompatActivity {
                 if (!mPendingHasChanged) {
                     Intent intent = new Intent(projectAddOn.this, projectList.class);
                     intent.putExtra("projectID", selectedID);
+                    intent.putExtra("title",selectedTitle);
                     startActivity(intent);
                     return true;
                 }
@@ -808,6 +822,7 @@ public class projectAddOn extends AppCompatActivity {
                                 // User clicked "Discard" button, navigate to parent activity.
                                 Intent intent = new Intent(projectAddOn.this, projectList.class);
                                 intent.putExtra("projectID", selectedID);
+                                intent.putExtra("title",selectedTitle);
                                 startActivity(intent);
                             }
                         };

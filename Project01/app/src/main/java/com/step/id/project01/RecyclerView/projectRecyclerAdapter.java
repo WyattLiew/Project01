@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.step.id.project01.R;
-import com.step.id.project01.sqlitedata.newProjectProvider;
+import com.step.id.project01.model.newProjectProvider;
 
 import java.util.ArrayList;
 
