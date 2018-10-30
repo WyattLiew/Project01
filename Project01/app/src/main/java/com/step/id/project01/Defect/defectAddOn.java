@@ -592,7 +592,7 @@ public class defectAddOn extends AppCompatActivity {
                                 }
 
                                 reportMessage = createReportSummary(projectDate, defect1String,penCommentString);
-                                Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                                 //emailIntent.setData(Uri.parse("mailto:"));
                                 emailIntent.setType("image/*");
                                 //Uri imageUri = Uri.parse("Path:: " + imageFilePath);

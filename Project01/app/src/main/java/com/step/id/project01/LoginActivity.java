@@ -117,14 +117,14 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
-                  //  if(mAuth.getCurrentUser().isEmailVerified()) {
+                   // if(mAuth.getCurrentUser().isEmailVerified()) {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                   // }else{
+                    //}else{
                       //  Toast.makeText(getApplicationContext(),"Please verify your email address",Toast.LENGTH_SHORT).show();
-                  //  }
+                   // }
                 }else{
                     Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                 }
