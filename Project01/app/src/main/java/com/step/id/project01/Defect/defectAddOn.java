@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,6 +28,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -35,7 +37,6 @@ import android.webkit.MimeTypeMap;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,7 +69,8 @@ public class defectAddOn extends AppCompatActivity {
 
     private EditText mDefect1,mPendingComment;
     private TextView mProjectDate;
-    private ProgressBar progressBar;
+    private AlertDialog b;
+    private AlertDialog.Builder dialogBuilder;
 
 
 
@@ -327,11 +329,25 @@ public class defectAddOn extends AppCompatActivity {
 
         mDefect1 =(EditText) findViewById(R.id.defect_1);
         mPendingComment =(EditText) findViewById(R.id.defect_comment);
-        progressBar = (ProgressBar) findViewById(R.id.def_addon_progressBar);
         mProjectDate = (TextView) findViewById(R.id.defect_date);
        projectImage = (ImageView) findViewById(R.id.defect_img);
-
     }
+
+    public void ShowProgressDialog() {
+        dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View dialogView = inflater.inflate(R.layout.progressbar, null);
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setCancelable(false);
+        b = dialogBuilder.create();
+        b.show();
+    }
+
+    public void HideProgressDialog(){
+
+        b.dismiss();
+    }
+
     private void initDate(){
         mProjectDate.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -363,7 +379,7 @@ public class defectAddOn extends AppCompatActivity {
     private String createReportSummary(String date, String defect1, String comments){
 
         String reportMessage = "Hi ";
-        reportMessage += "\n" + getString(R.string.report_summary_date,date);
+        reportMessage += "\n" + "\n" + getString(R.string.report_summary_date,date);
         reportMessage += "\n" + "\n" + getString(R.string.report_summary_description);
         reportMessage += "\n" + getString(R.string.report_summary_defect_1,defect1);
         reportMessage += "\n" + "\n" + getString(R.string.report_summary_comments,comments);
@@ -433,6 +449,7 @@ public class defectAddOn extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (items[which].equals("Save and email")) {
+                            ShowProgressDialog();
                             String projectDate = mProjectDate.getText().toString().trim();
                             String defect1String = mDefect1.getText().toString().trim();
                             String penCommentString = mPendingComment.getText().toString().trim();
@@ -451,7 +468,7 @@ public class defectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                        HideProgressDialog();
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
@@ -470,7 +487,7 @@ public class defectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                               HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         })
@@ -483,8 +500,8 @@ public class defectAddOn extends AppCompatActivity {
                             }
                             reportMessage = createReportSummary(projectDate, defect1String , penCommentString);
                             Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                            //emailIntent.setData(Uri.parse("mailto:"));
-                            emailIntent.setType("image/*");
+                            emailIntent.setData(Uri.parse("mailto:"));
+                            //emailIntent.setType("image/*");
                             //Uri imageUri = Uri.parse("Path:: " + imageFilePath);
                             emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
                             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
@@ -494,19 +511,19 @@ public class defectAddOn extends AppCompatActivity {
                             }
 
                         } else if (items[which].equals("Save")) {
-                            progressBar.setVisibility(View.VISIBLE);
+                            ShowProgressDialog();
                             final String projectDate = mProjectDate.getText().toString().trim();
                             final String defect1String = mDefect1.getText().toString().trim();
                             final String penCommentString = mPendingComment.getText().toString().trim();
 
                             if (selectImageUrl == null) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(defectAddOn.this, "Image cannot be null.", Toast.LENGTH_SHORT).show();
                             } else if (defect1String.length() ==0 || projectDate.length() ==0 ) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 checkEmptyEditText(defect1String);
                            }else if(projectDate.matches(date)){
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                Toast.makeText(defectAddOn.this,"Please select a date.",Toast.LENGTH_SHORT).show();
                             }
                            else{
@@ -518,7 +535,7 @@ public class defectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                        HideProgressDialog();
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
@@ -535,7 +552,7 @@ public class defectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                               HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         })
@@ -565,6 +582,7 @@ public class defectAddOn extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (items_update[which].equals("Update and email")) {
+                            ShowProgressDialog();
                             String projectDate = mProjectDate.getText().toString().trim();
                             String defect1String = mDefect1.getText().toString().trim();
                             String penCommentString = mPendingComment.getText().toString().trim();
@@ -593,8 +611,8 @@ public class defectAddOn extends AppCompatActivity {
 
                                 reportMessage = createReportSummary(projectDate, defect1String,penCommentString);
                                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                                //emailIntent.setData(Uri.parse("mailto:"));
-                                emailIntent.setType("image/*");
+                                emailIntent.setData(Uri.parse("mailto:"));
+                                //emailIntent.setType("image/*");
                                 //Uri imageUri = Uri.parse("Path:: " + imageFilePath);
                                 emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
                                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
@@ -613,7 +631,7 @@ public class defectAddOn extends AppCompatActivity {
                                     fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            progressBar.setVisibility(View.GONE);
+                                           HideProgressDialog();
                                             Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                             while (!uriTask.isSuccessful()) ;
                                             Uri downloadUri = uriTask.getResult();
@@ -631,13 +649,13 @@ public class defectAddOn extends AppCompatActivity {
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    progressBar.setVisibility(View.GONE);
+                                                    HideProgressDialog();
                                                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             });
 
                                 }else {
-                                    progressBar.setVisibility(View.GONE);
+                                    HideProgressDialog();
                                     DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Defect Add On");
 
                                     defect defects = new defect(selectedDefectID, selectedImage, defect1String, projectDate, penCommentString);
@@ -654,16 +672,16 @@ public class defectAddOn extends AppCompatActivity {
                             }
 
                         } else if (items_update[which].equals("Update")) {
-                            progressBar.setVisibility(View.VISIBLE);
+                            ShowProgressDialog();
                             final String projectDate = mProjectDate.getText().toString().trim();
                             final String defect1String = mDefect1.getText().toString().trim();
                             final String penCommentString = mPendingComment.getText().toString().trim();
 
                             if (defect1String.length() ==0 || projectDate.length() ==0 ) {
-                                progressBar.setVisibility(View.GONE);
+                               HideProgressDialog();
                                 checkEmptyEditText(defect1String);
                             }else if(projectDate.matches(date)){
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(defectAddOn.this,"Please select a date.",Toast.LENGTH_SHORT).show();
                             }
 
@@ -676,7 +694,7 @@ public class defectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                        HideProgressDialog();
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
@@ -693,13 +711,13 @@ public class defectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                                HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
                             }else {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Defect Add On");
 
                                 defect defects = new defect(selectedDefectID, selectedImage, defect1String, projectDate, penCommentString);

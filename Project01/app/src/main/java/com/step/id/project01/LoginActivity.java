@@ -118,7 +118,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener 
                 progressBar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
                    // if(mAuth.getCurrentUser().isEmailVerified()) {
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
