@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_weight="1"
-            android:background="#29323c"
+            android:background="@color/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/app_name">
@@ -31,10 +31,11 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:tabMaxWidth="0dp"
+            android:background="@color/colorPrimary"
             app:tabGravity="fill"
-            app:tabMode="fixed"
-            android:background="#29323c">
+            app:tabIndicatorColor="@color/colorSecondary"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed">
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabItem"

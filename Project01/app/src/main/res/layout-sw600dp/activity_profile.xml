@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/backgroundcolor"
     tools:context=".ProfileActivity">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -12,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:background="@drawable/profilebackground"
+            android:background="@color/colorPrimary"
             android:orientation="vertical">
 
             <ImageView
@@ -38,7 +39,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:gravity="center"
+                android:paddingLeft="@dimen/_90sdp"
                 android:layout_marginTop="30dp"
                 android:layout_height="wrap_content">
                 <ImageView
@@ -58,8 +59,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_marginRight="@dimen/_43sdp"
-                android:gravity="center_horizontal"
+                android:paddingLeft="@dimen/_90sdp"
                 android:layout_marginTop="16dp"
                 android:layout_height="wrap_content">
                 <ImageView

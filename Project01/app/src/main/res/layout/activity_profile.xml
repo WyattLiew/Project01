@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundcolor"
     android:orientation="vertical"
     tools:context=".ProfileActivity">
     <RelativeLayout
@@ -12,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:background="@drawable/profilebackground"
+            android:background="@color/colorPrimary"
             android:orientation="vertical">
             <android.support.v7.widget.CardView
                 android:layout_marginTop="35dp"
@@ -45,7 +46,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:paddingLeft="55dp"
+            android:paddingLeft="@dimen/_50sdp"
             android:layout_marginTop="30dp"
             android:layout_height="wrap_content">
             <ImageView
@@ -59,13 +60,13 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:textSize="16sp"
-                android:text="example@steppl.com.sg"
+                android:text="example@steppl.com"
                 android:textColor="#fff"/>
         </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:paddingLeft="55dp"
+                android:paddingLeft="@dimen/_50sdp"
                 android:layout_marginTop="16dp"
                 android:layout_height="wrap_content">
                 <ImageView
@@ -79,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="20dp"
                     android:textSize="16sp"
-                    android:text="+65 98887777"
+                    android:text="98887777"
                     android:textColor="#fff"/>
             </LinearLayout>
         </LinearLayout>

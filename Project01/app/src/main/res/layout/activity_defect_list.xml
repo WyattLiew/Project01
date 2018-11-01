@@ -16,10 +16,16 @@
         android:id="@+id/defectList_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        android:src="@mipmap/ic_add_plus" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@mipmap/ic_add_plus"
+        app:backgroundTint="@color/colorSecondary" />
     <RelativeLayout
         android:id="@+id/defect_empty_view"
         android:layout_width="wrap_content"
