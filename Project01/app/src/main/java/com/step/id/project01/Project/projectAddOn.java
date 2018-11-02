@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -36,7 +38,6 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,9 +52,9 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.step.id.project01.Image.BitmapUtils;
 import com.step.id.project01.R;
 import com.step.id.project01.model.ProjectAddOnProvider;
-import com.step.id.project01.Image.BitmapUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,7 +71,8 @@ public class projectAddOn extends AppCompatActivity {
 
     private EditText mProjectAddOnNotes;
     private TextView mProjectAddOnDate;
-    private ProgressBar progressBar;
+    private AlertDialog b;
+    private AlertDialog.Builder dialogBuilder;
 
     //update data
     private String selectednotes, selectedprojDate, reportMessage;
@@ -96,6 +98,8 @@ public class projectAddOn extends AppCompatActivity {
     String imageFilePath;
     private Uri selectImageUrl;
     private Bitmap mResultBitmap;
+
+    private Bitmap compressorImageFile;
 
     // For attach image to email
     File pic;
@@ -176,9 +180,23 @@ public class projectAddOn extends AppCompatActivity {
 
         mProjectAddOnNotes = (EditText) findViewById(R.id.projectAddOnNotes);
         mProjectAddOnDate = (TextView) findViewById(R.id.projectAddOnDate);
-        progressBar = (ProgressBar) findViewById(R.id.addon_progressBar);
         projectAddOnImage = (ImageView) findViewById(R.id.projectAddOn_img);
         mProjectStatusSpinner = (Spinner) findViewById(R.id.spinner_projectStatus);
+    }
+
+    public void ShowProgressDialog() {
+        dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View dialogView = inflater.inflate(R.layout.progressbar, null);
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setCancelable(false);
+        b = dialogBuilder.create();
+        b.show();
+    }
+
+    public void HideProgressDialog(){
+
+        b.dismiss();
     }
 
 
@@ -247,6 +265,29 @@ public class projectAddOn extends AppCompatActivity {
                 Log.e("Attachment Path:", imageFilePath);
 
                 selectImageUrl = Uri.fromFile(new File(imageFilePath));
+
+                /** Compress image
+                File newImageFile = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                    newImageFile = new File(Objects.requireNonNull(imageFilePath));
+                }
+                try {
+                    compressorImageFile = new Compressor(projectAddOn.this)
+                            .setMaxHeight(200)
+                            .setMaxWidth(200)
+                            .setQuality(20)
+                            .compressToBitmap(newImageFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                compressorImageFile.compress(Bitmap.CompressFormat.PNG,100,stream);
+                byte [] image = stream.toByteArray();
+
+                selectImageUrl = Uri.fromFile(new File(String.valueOf(newImageFile)));
+                 **/
+
 
                 mResultBitmap = ((BitmapDrawable) projectAddOnImage.getDrawable()).getBitmap();
 
@@ -535,13 +576,13 @@ public class projectAddOn extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (items_add[which].equals("Save")) {
-                            progressBar.setVisibility(View.VISIBLE);
+                            ShowProgressDialog();
                             String projectDate = mProjectAddOnDate.getText().toString().trim();
                             if (selectImageUrl == null) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(projectAddOn.this, "Image cannot be null.", Toast.LENGTH_SHORT).show();
                             } else if (projectDate.matches(date)) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
                             } else {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
@@ -553,14 +594,18 @@ public class projectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                        HideProgressDialog();
+
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
+
                                         Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+
                                         String id = mDatabaseAddon.push().getKey();
                                         ProjectAddOnProvider projectAddOnProvider = new ProjectAddOnProvider(id, downloadUri.toString(), mProjectAddOnNotes.getText().toString().trim(), mProjectAddOnDate.getText().toString().trim(), mProjectStatus);
                                         mDatabaseAddon.child(id).setValue(projectAddOnProvider);
+
                                         Intent intent = new Intent(projectAddOn.this, projectList.class);
                                         intent.putExtra("projectID", selectedID);
                                         intent.putExtra("title",selectedTitle);
@@ -570,7 +615,7 @@ public class projectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                                HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         })
@@ -582,13 +627,13 @@ public class projectAddOn extends AppCompatActivity {
                                         });
                             }
                         } else if (items_add[which].equals("Save and Email")) {
-                            progressBar.setVisibility(View.VISIBLE);
+                            ShowProgressDialog();
                             String projectDate = mProjectAddOnDate.getText().toString().trim();
                             if (selectImageUrl == null) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(projectAddOn.this, "Image cannot be null.", Toast.LENGTH_SHORT).show();
                             } else if (projectDate.matches(date)) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
                             } else {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
@@ -599,7 +644,7 @@ public class projectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                        HideProgressDialog();
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
@@ -617,7 +662,7 @@ public class projectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                                HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         })
@@ -630,8 +675,9 @@ public class projectAddOn extends AppCompatActivity {
                             }
 
                             reportMessage = createReportSummary(mProjectStatus, mProjectAddOnDate.getText().toString(), mProjectAddOnNotes.getText().toString());
-                            Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                            emailIntent.setType("image/*");
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                            emailIntent.setData(Uri.parse("mailto:"));
+                            //emailIntent.setType("image/*");
                             emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
                             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
                             emailIntent.putExtra(Intent.EXTRA_TEXT, reportMessage);
@@ -654,12 +700,12 @@ public class projectAddOn extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (items_update[which].equals("Update")) {
-                            progressBar.setVisibility(View.VISIBLE);
+                            ShowProgressDialog();
                             final String noteString = mProjectAddOnNotes.getText().toString().trim();
                             final String projectDate = mProjectAddOnDate.getText().toString().trim();
 
                             if (projectDate.matches(date)) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
                             }
 
@@ -673,7 +719,7 @@ public class projectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                       HideProgressDialog();
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
@@ -689,13 +735,13 @@ public class projectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                                HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
                             } else {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects Add On");
 
                                 ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID, selectedImage, noteString, projectDate, mProjectStatus);
@@ -710,12 +756,12 @@ public class projectAddOn extends AppCompatActivity {
                             }
                         } else if (items_update[which].equals("Update and Email")) {
 
-                            progressBar.setVisibility(View.VISIBLE);
+                           ShowProgressDialog();
                             final String noteString = mProjectAddOnNotes.getText().toString().trim();
                             final String projectDate = mProjectAddOnDate.getText().toString().trim();
 
                             if (projectDate.matches(date)) {
-                                progressBar.setVisibility(View.GONE);
+                                HideProgressDialog();
                                 Toast.makeText(projectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
                             }
 
@@ -733,8 +779,9 @@ public class projectAddOn extends AppCompatActivity {
                             } catch (IOException e) {
                                 Log.e("BROKEN", "Could not write file " + e.getMessage());
                             }
-                            Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                            emailIntent.setType("image/*");
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                            emailIntent.setData(Uri.parse("mailto:"));
+                            //emailIntent.setType("image/*");
                             emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
                             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
                             emailIntent.putExtra(Intent.EXTRA_TEXT, reportMessage);
@@ -751,7 +798,7 @@ public class projectAddOn extends AppCompatActivity {
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        progressBar.setVisibility(View.GONE);
+                                        HideProgressDialog();
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isSuccessful()) ;
                                         Uri downloadUri = uriTask.getResult();
@@ -765,13 +812,13 @@ public class projectAddOn extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                progressBar.setVisibility(View.GONE);
+                                                HideProgressDialog();
                                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
 
                             } else {
-                                progressBar.setVisibility(View.GONE);
+                               HideProgressDialog();
                                 DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Projects Add On");
 
                                 ProjectAddOnProvider newProjectProvider = new ProjectAddOnProvider(selectedProjectID, selectedImage, noteString, projectDate, mProjectStatus);

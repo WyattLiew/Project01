@@ -3,6 +3,7 @@ package com.step.id.project01;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +30,8 @@ public class tab2_project extends Fragment {
     private static final String TAG = "tab2_project";
     private static final String projectID = "projectID";
 
+    private FloatingActionButton fab;
+
     private projectRecyclerAdapter projectRecyclerAdapter;
     private View emptyView;
     private RecyclerView projectRecyclerView;
@@ -52,6 +55,14 @@ public class tab2_project extends Fragment {
         databaseNewProject = FirebaseDatabase.getInstance().getReference();
         projectsRef = databaseNewProject.child("Projects").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+        fab = (FloatingActionButton) rootView.findViewById(R.id.projectCard);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), projectEditor.class);
+                startActivity(intent);
+            }
+        });
 
         onRetrieve();
 

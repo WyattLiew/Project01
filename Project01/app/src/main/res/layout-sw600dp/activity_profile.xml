@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundcolor"
     android:orientation="vertical"
+    android:background="@color/backgroundcolor"
     tools:context=".ProfileActivity">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,23 +15,16 @@
             android:layout_height="300dp"
             android:background="@color/colorPrimary"
             android:orientation="vertical">
-            <android.support.v7.widget.CardView
-                android:layout_marginTop="35dp"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_gravity="center_horizontal"
-                android:elevation="12dp"
-                android:id="@+id/view2"
-                app:cardCornerRadius="40dp"
-                android:layout_centerHorizontal="true">
 
-                <ImageView
-                    android:id="@+id/profile_Image"
-                    android:layout_width="80dp"
-                    android:layout_height="match_parent"
-                    android:clickable="true"
-                    android:scaleType="centerCrop" />
-            </android.support.v7.widget.CardView>
+            <ImageView
+                android:layout_marginTop="35dp"
+                android:id="@+id/profile_Image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:scaleType="centerCrop" />
+
             <TextView
                 android:id="@+id/profile_name"
                 android:layout_width="wrap_content"
@@ -43,30 +36,30 @@
                 android:textColor="#fff"
                 android:textSize="21sp"
                 android:text="name"/>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:paddingLeft="@dimen/_50sdp"
-            android:layout_marginTop="30dp"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_email_white_24dp"/>
-            <TextView
-                android:id="@+id/profile_email"
-                android:layout_gravity="center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20dp"
-                android:textSize="16sp"
-                android:text="example@steppl.com"
-                android:textColor="#fff"/>
-        </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:paddingLeft="@dimen/_50sdp"
+                android:paddingLeft="@dimen/_90sdp"
+                android:layout_marginTop="30dp"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_email_white_24dp"/>
+                <TextView
+                    android:id="@+id/profile_email"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:textSize="16sp"
+                    android:text="example@steppl.com.sg"
+                    android:textColor="#fff"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:paddingLeft="@dimen/_90sdp"
                 android:layout_marginTop="16dp"
                 android:layout_height="wrap_content">
                 <ImageView

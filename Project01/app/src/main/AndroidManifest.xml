@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.step.id.project01">
 
+    <supports-screens android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA2" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -32,9 +38,9 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:largeHeap="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
         <activity
             android:name=".Defect.defectAddOn"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -70,7 +76,7 @@
         </activity>
         <activity
             android:name=".Project.projectAddOn"
-            android:label="Project Add On" />
+            android:label="Project Add On"/>
         <activity
             android:name=".registerActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -88,18 +94,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MonitorUserActivity" />
         </activity>
+
         <activity
             android:name=".MonitorProjectAddOnActivity"
-            android:label="Project Add On" />
+            android:label="Project Add On"/>
+
         <activity android:name=".MonitorDefectActivity"
             android:label="Defect List">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MonitorUserActivity" />
         </activity>
+
         <activity android:name=".MonitorDefectAddOnActivity"
             android:label="Defect Add On">
         </activity>
+
         <activity
             android:name=".ProfileActivity"
             android:label="My profile">
@@ -107,6 +117,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
         <activity
             android:name=".ForgotPasswordActivity"
             android:label="Forgot Password">

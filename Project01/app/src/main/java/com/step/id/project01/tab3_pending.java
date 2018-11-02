@@ -3,6 +3,7 @@ package com.step.id.project01;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,8 @@ public class tab3_pending extends Fragment {
     private static final String TAG = "tab3_pending";
     private static final String pendingID = "pendingID";
 
+    private FloatingActionButton fab;
+
     private pendingRecyclerAdapter pendingRecyclerAdapter;
     private View emptyView;
     private RecyclerView pendingRecyclerView;
@@ -52,6 +55,14 @@ public class tab3_pending extends Fragment {
         databaseNewPending = FirebaseDatabase.getInstance().getReference();
         pendingRef = databaseNewPending.child("Pending").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+        fab = (FloatingActionButton) rootView.findViewById(R.id.pendingCard);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), defectEditor.class);
+                startActivity(intent);
+            }
+        });
 
         onRetrieve();
 

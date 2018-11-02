@@ -72,6 +72,10 @@ public class defectList extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
 
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
                 String rowid = listNewDefect.get(position).getId();
                 String defect = listNewDefect.get(position).getDefect();
                 String date = listNewDefect.get(position).getDate();
@@ -92,11 +96,6 @@ public class defectList extends AppCompatActivity {
                 intent.putExtra("HideMenu", HideMenu);
                 Log.d(TAG, "The row id is: " + rowid);
                 startActivity(intent);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-                //
             }
         }));
     }
