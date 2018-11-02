@@ -23,7 +23,7 @@ public class defectImageAddon {
         this.imgURL = imgURL;
     }
 
-    public defectImageAddon(String id, String imgURL) {
+    public defectImageAddon( String id,String imgURL) {
         this.id = id;
         this.imgURL = imgURL;
     }

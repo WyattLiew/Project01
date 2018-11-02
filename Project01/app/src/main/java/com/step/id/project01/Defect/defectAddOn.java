@@ -60,9 +60,7 @@ import com.squareup.picasso.Picasso;
 import com.step.id.project01.Image.BitmapUtils;
 import com.step.id.project01.R;
 import com.step.id.project01.RecyclerView.DefImageAdapter;
-import com.step.id.project01.RecyclerView.UploadListAdapter;
 import com.step.id.project01.model.defect;
-import com.step.id.project01.model.defectImage;
 import com.step.id.project01.model.defectImageAddon;
 
 import java.io.File;
@@ -86,8 +84,6 @@ public class defectAddOn extends AppCompatActivity {
 
     // Upload image
     private RecyclerView mUploadList;
-    private UploadListAdapter uploadListAdapter;
-    private ArrayList<defectImage> defectImages = new ArrayList<>();
     private ArrayList<defectImageAddon> listNewDefect =new ArrayList<>();
 
     //Camera
@@ -118,7 +114,7 @@ public class defectAddOn extends AppCompatActivity {
     private DefImageAdapter defImageAdapter;
 
     //Fire base
-    private DatabaseReference mDatabaseAddon,mDatabaseAddonImage;
+    private DatabaseReference mDatabaseAddon,mDatabaseAddonImages,mDatabaseAddonImage;
     private StorageReference mStorageReference;
     private FirebaseStorage mStorage;
 
@@ -158,9 +154,10 @@ public class defectAddOn extends AppCompatActivity {
         mUploadList.setHasFixedSize(true);
 
         mDatabaseAddon = FirebaseDatabase.getInstance().getReference("Defect Add On").child(selectedID);
-        mDatabaseAddonImage = FirebaseDatabase.getInstance().getReference("Defect Add On").child(selectedID).child(selectedDefectID).child("Defect add on image");
+        mDatabaseAddonImages = FirebaseDatabase.getInstance().getReference("Defect add on image");
         mStorage = FirebaseStorage.getInstance();
         mStorageReference = FirebaseStorage.getInstance().getReference("Defect add on").child(selectedTitle);
+
 
         //Check permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
@@ -181,8 +178,12 @@ public class defectAddOn extends AppCompatActivity {
         //Check unsaved changes
         initCheckUnsavedChanges();
 
-        //Retrieve image from fire base
-        onRetrieve();
+        if (HideMenu == 1){
+            mDatabaseAddonImage= FirebaseDatabase.getInstance().getReference("Defect add on image").child(selectedDefectID);
+            //Retrieve image from fire base
+            onRetrieve();
+        }
+
     }
 
     private void SelectImage() {
@@ -245,13 +246,13 @@ public class defectAddOn extends AppCompatActivity {
 
             if (requestCode == REQUEST_CAMERA) {
 
-                int itemList = defectImages.size();
+                int itemList = listNewDefect.size();
 
                 if (itemList < 5) {
 
-                    defectImage s;
+                    defectImageAddon s;
 
-                    s = new defectImage();
+                    s = new defectImageAddon();
 
                     projectImage.setImageURI(Uri.parse(imageFilePath));
                     projectImage.setMinimumHeight(512);
@@ -261,9 +262,9 @@ public class defectAddOn extends AppCompatActivity {
 
                     BitmapUtils.saveImage(defectAddOn.this, mResultBitmap);
 
-                    s.setUri(Uri.fromFile(new File(imageFilePath)));
-                    defectImages.add(s);
-                    mUploadList.setAdapter(new UploadListAdapter(this, defectImages));
+                    s.setImgURL(Uri.fromFile(new File(imageFilePath)).toString());
+                    listNewDefect.add(s);
+                    mUploadList.setAdapter(new DefImageAdapter(this, listNewDefect));
 
 
                     try {
@@ -288,11 +289,11 @@ public class defectAddOn extends AppCompatActivity {
 
             } else if (requestCode == SELECT_FILE) {
 
-                defectImage s;
+                defectImageAddon s;
 
                 if (data.getClipData() != null) {
 
-                    int itemList = defectImages.size();
+                    int itemList = listNewDefect.size();
                     int totalItemsSelected = data.getClipData().getItemCount();
 
                     if (totalItemsSelected > 5) {
@@ -300,33 +301,33 @@ public class defectAddOn extends AppCompatActivity {
                     } else {
 
                         if (itemList + totalItemsSelected >= 6) {
-                            defectImages.clear();
+                            listNewDefect.clear();
                             for (int i = 0; i < totalItemsSelected; i++) {
 
-                                s = new defectImage();
+                                s = new defectImageAddon();
 
                                 selectImageUrl = data.getClipData().getItemAt(i).getUri();
 
-                                s.setName(getFileName(selectImageUrl));
+                                //s.setName(getFileName(selectImageUrl));
 
-                                s.setUri(selectImageUrl);
-                                defectImages.add(s);
+                                s.setImgURL(selectImageUrl.toString());
+                                listNewDefect.add(s);
                             }
-                            mUploadList.setAdapter(new UploadListAdapter(this, defectImages));
+                            mUploadList.setAdapter(new DefImageAdapter(this, listNewDefect));
                         } else {
                             for (int i = 0; i < totalItemsSelected; i++) {
 
-                                s = new defectImage();
+                                s = new defectImageAddon();
 
                                 //Uri fileUri = data.getClipData().getItemAt(i).getUri();
                                 selectImageUrl = data.getClipData().getItemAt(i).getUri();
 
-                                s.setName(getFileName(selectImageUrl));
+                                //s.setName(getFileName(selectImageUrl));
 
-                                s.setUri(selectImageUrl);
-                                defectImages.add(s);
+                                s.setImgURL(selectImageUrl.toString());
+                                listNewDefect.add(s);
                             }
-                            mUploadList.setAdapter(new UploadListAdapter(this, defectImages));
+                            mUploadList.setAdapter(new DefImageAdapter(this, listNewDefect));
                         }
                     }
                 } else {
@@ -571,7 +572,6 @@ public class defectAddOn extends AppCompatActivity {
                                 StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                         + "." + getFileExtension(selectImageUrl));
 
-                                BitmapUtils.saveImage(defectAddOn.this, mResultBitmap);
 
                                 fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                     @Override
@@ -663,12 +663,12 @@ public class defectAddOn extends AppCompatActivity {
                                                 }
                                             });
 
-                                for (int i = 0; i < defectImages.size(); i++) {
+                                for (int i = 0; i < listNewDefect.size(); i++) {
 
                                     StorageReference fileReferences = mStorageReference.child(System.currentTimeMillis()
-                                            + "." + getFileExtension(defectImages.get(i).getUri()));
+                                            + "." + getFileExtension(Uri.parse(listNewDefect.get(i).getImgURL())));
 
-                                    fileReferences.putFile(defectImages.get(i).getUri()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    fileReferences.putFile(Uri.parse(listNewDefect.get(i).getImgURL())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                             HideProgressDialog();
@@ -676,9 +676,9 @@ public class defectAddOn extends AppCompatActivity {
                                             while (!uriTask.isSuccessful()) ;
                                             Uri downloadUri = uriTask.getResult();
                                             Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                                            String imageid = mDatabaseAddon.push().getKey();
+                                            String imageid = mDatabaseAddonImages.push().getKey();
                                             defectImageAddon defect = new defectImageAddon(imageid, downloadUri.toString());
-                                            mDatabaseAddon.child(id).child("Defect add on image").child(imageid).setValue(defect);
+                                            mDatabaseAddonImages.child(id).child(imageid).setValue(defect);
                                         }
                                     })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -686,12 +686,6 @@ public class defectAddOn extends AppCompatActivity {
                                                 public void onFailure(@NonNull Exception e) {
                                                     HideProgressDialog();
                                                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            })
-                                            .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                                                    // double progress = (100.0 * taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
                                                 }
                                             });
                                 }
@@ -761,8 +755,6 @@ public class defectAddOn extends AppCompatActivity {
                                     StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
                                             + "." + getFileExtension(selectImageUrl));
 
-                                    BitmapUtils.saveImage(defectAddOn.this, mResultBitmap);
-
                                     fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -774,10 +766,6 @@ public class defectAddOn extends AppCompatActivity {
                                             StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
                                             imageRef.delete();
                                             updateProject(selectedDefectID, downloadUri.toString(), mDefect1.getText().toString(), mProjectDate.getText().toString(), mPendingComment.getText().toString());
-                                            Intent intent = new Intent(defectAddOn.this, defectList.class);
-                                            //intent.putExtra("pendingID", selectedID);
-                                            //intent.putExtra("Title",selectedTitle);
-                                            //startActivity(intent);
                                             finish();
                                         }
                                     })
@@ -851,6 +839,33 @@ public class defectAddOn extends AppCompatActivity {
                                             }
                                         });
 
+                                deleteImageAddOn(selectedDefectID);
+                                for (int i = 0; i < listNewDefect.size(); i++) {
+
+                                    StorageReference fileReferences = mStorageReference.child(System.currentTimeMillis()
+                                            + "." + getFileExtension(Uri.parse(listNewDefect.get(i).getImgURL())));
+
+                                    fileReferences.putFile(Uri.parse(listNewDefect.get(i).getImgURL())).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            HideProgressDialog();
+                                            Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                            while (!uriTask.isSuccessful()) ;
+                                            Uri downloadUri = uriTask.getResult();
+                                            Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                                            String id = mDatabaseAddonImages.push().getKey();
+                                            updateImage(id,downloadUri.toString());
+                                        }
+                                    })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    HideProgressDialog();
+                                                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+
                             } else {
                                 HideProgressDialog();
                                 DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Defect Add On");
@@ -879,9 +894,10 @@ public class defectAddOn extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 deleteProjectAddOn(selectedDefectID);
+                                deleteImageAddOn(selectedDefectID);
                                 Intent intent = new Intent(defectAddOn.this, defectList.class);
                                 intent.putExtra("pendingID", selectedID);
-                                intent.putExtra("tTitle", selectedTitle);
+                                intent.putExtra("Title", selectedTitle);
                                 startActivity(intent);
                             }
                         };
@@ -960,12 +976,32 @@ public class defectAddOn extends AppCompatActivity {
         return true;
     }
 
+    private boolean updateImage(String id,String imgUri){
+
+        DatabaseReference databaseNewDefect = FirebaseDatabase.getInstance().getReference("Defect add on image");
+
+        defectImageAddon defectImage = new defectImageAddon(id, imgUri);
+
+        databaseNewDefect.child(selectedDefectID).child(id).setValue(defectImage);
+
+        Toast.makeText(this, "Defect Updated Successfully", Toast.LENGTH_SHORT).show();
+
+        return true;
+    }
+
     private void deleteProjectAddOn(String id) {
         DatabaseReference deleteDefectAddOn = FirebaseDatabase.getInstance().getReference("Defect Add On");
 
         StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
         imageRef.delete();
         deleteDefectAddOn.child(selectedID).child(id).removeValue();
+
+        Toast.makeText(this, "Defect is deleted", Toast.LENGTH_SHORT).show();
+    }
+    private void deleteImageAddOn(String id) {
+        DatabaseReference deleteDefectAddOn = FirebaseDatabase.getInstance().getReference("Defect add on image");
+
+        deleteDefectAddOn.child(id).removeValue();
 
         Toast.makeText(this, "Defect is deleted", Toast.LENGTH_SHORT).show();
     }
