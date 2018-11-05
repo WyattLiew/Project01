@@ -47,13 +47,9 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
@@ -180,8 +176,6 @@ public class defectAddOn extends AppCompatActivity {
 
         if (HideMenu == 1){
             mDatabaseAddonImage= FirebaseDatabase.getInstance().getReference("Defect add on image").child(selectedDefectID);
-            //Retrieve image from fire base
-            onRetrieve();
         }
 
     }
@@ -334,6 +328,10 @@ public class defectAddOn extends AppCompatActivity {
                     if (data.getData() != null) {
 
                         selectImageUrl = data.getData();
+                        s = new defectImageAddon();
+                        s.setImgURL(selectImageUrl.toString());
+                        listNewDefect.add(s);
+                        mUploadList.setAdapter(new DefImageAdapter(this,listNewDefect));
                         projectImage.setImageURI(selectImageUrl);
                         Bitmap imgBitmap = ((BitmapDrawable) projectImage.getDrawable()).getBitmap();
 
@@ -551,74 +549,13 @@ public class defectAddOn extends AppCompatActivity {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 //Create dialog to send email / store data
-                final CharSequence[] items = {"Save and email", "Save", "Cancel"};
+                final CharSequence[] items = {"Save", "Cancel"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(defectAddOn.this);
                 builder.setTitle("Select options");
                 builder.setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (items[which].equals("Save and email")) {
-                            ShowProgressDialog();
-                            String projectDate = mProjectDate.getText().toString().trim();
-                            String defect1String = mDefect1.getText().toString().trim();
-                            String penCommentString = mPendingComment.getText().toString().trim();
-                            //  Bitmap imgBitmap = ((BitmapDrawable)projectImage.getDrawable()).getBitmap();
-
-                            if (defect1String.length() == 0 || projectDate.length() == 0) {
-                                checkEmptyEditText(defect1String);
-                            } else if (projectDate.matches(date)) {
-                                Toast.makeText(defectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
-                                        + "." + getFileExtension(selectImageUrl));
-
-
-                                fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        HideProgressDialog();
-                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                        while (!uriTask.isSuccessful()) ;
-                                        Uri downloadUri = uriTask.getResult();
-                                        Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                                        String id = mDatabaseAddon.push().getKey();
-                                        defect defect = new defect(id, downloadUri.toString(), mDefect1.getText().toString(), mProjectDate.getText().toString(), mPendingComment.getText().toString());
-                                        mDatabaseAddon.child(id).setValue(defect);
-
-                                        finish();
-                                        // Intent intent = new Intent(defectAddOn.this, defectList.class);
-                                        //intent.putExtra("pendingID", selectedID);
-                                        //intent.putExtra("Title",selectedTitle);
-                                        //startActivity(intent);
-                                    }
-                                })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                HideProgressDialog();
-                                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        })
-                                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                            @Override
-                                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                                                // double progress = (100.0 * taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
-                                            }
-                                        });
-                            }
-                            reportMessage = createReportSummary(projectDate, defect1String, penCommentString);
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                            emailIntent.setData(Uri.parse("mailto:"));
-                            //emailIntent.setType("image/*");
-                            //Uri imageUri = Uri.parse("Path:: " + imageFilePath);
-                            emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
-                            emailIntent.putExtra(Intent.EXTRA_TEXT, reportMessage);
-                            if (emailIntent.resolveActivity(getPackageManager()) != null) {
-                                startActivity(emailIntent);
-                            }
-
-                        } else if (items[which].equals("Save")) {
+                        if (items[which].equals("Save")) {
                             ShowProgressDialog();
                             final String projectDate = mProjectDate.getText().toString().trim();
                             final String defect1String = mDefect1.getText().toString().trim();
@@ -705,96 +642,13 @@ public class defectAddOn extends AppCompatActivity {
 
             case R.id.action_update:
                 //Create dialog to send email / store data
-                final CharSequence[] items_update = {"Update and email", "Update", "Cancel"};
+                final CharSequence[] items_update = {"Update", "Cancel"};
                 AlertDialog.Builder builder_update = new AlertDialog.Builder(defectAddOn.this);
                 builder_update.setTitle("Select options");
                 builder_update.setItems(items_update, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (items_update[which].equals("Update and email")) {
-                            ShowProgressDialog();
-                            String projectDate = mProjectDate.getText().toString().trim();
-                            String defect1String = mDefect1.getText().toString().trim();
-                            String penCommentString = mPendingComment.getText().toString().trim();
-                            Bitmap imgBitmap = ((BitmapDrawable) projectImage.getDrawable()).getBitmap();
-
-                            if (defect1String.length() == 0 || projectDate.length() == 0) {
-                                checkEmptyEditText(defect1String);
-                            } else if (imgBitmap == null) {
-                                Toast.makeText(defectAddOn.this, "Image cannot be null.", Toast.LENGTH_SHORT).show();
-                            } else if (projectDate.matches(date)) {
-                                Toast.makeText(defectAddOn.this, "Please select a date.", Toast.LENGTH_SHORT).show();
-                            } else {
-                                try {
-                                    File root = Environment.getExternalStorageDirectory();
-                                    if (root.canWrite()) {
-                                        pic = new File(root, "pic.png");
-                                        FileOutputStream out = new FileOutputStream(pic);
-                                        imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                                        out.flush();
-                                        out.close();
-                                    }
-                                } catch (IOException e) {
-                                    Log.e("BROKEN", "Could not write file " + e.getMessage());
-                                }
-
-                                reportMessage = createReportSummary(projectDate, defect1String, penCommentString);
-                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                                emailIntent.setData(Uri.parse("mailto:"));
-                                //emailIntent.setType("image/*");
-                                //Uri imageUri = Uri.parse("Path:: " + imageFilePath);
-                                emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(pic));
-                                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports");
-                                emailIntent.putExtra(Intent.EXTRA_TEXT, reportMessage);
-                                if (emailIntent.resolveActivity(getPackageManager()) != null) {
-                                    startActivity(emailIntent);
-                                } else {
-                                    Toast.makeText(defectAddOn.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-                                }
-                                if (selectImageUrl != null) {
-                                    StorageReference fileReference = mStorageReference.child(System.currentTimeMillis()
-                                            + "." + getFileExtension(selectImageUrl));
-
-                                    fileReference.putFile(selectImageUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            HideProgressDialog();
-                                            Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                            while (!uriTask.isSuccessful()) ;
-                                            Uri downloadUri = uriTask.getResult();
-                                            Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                                            StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
-                                            imageRef.delete();
-                                            updateProject(selectedDefectID, downloadUri.toString(), mDefect1.getText().toString(), mProjectDate.getText().toString(), mPendingComment.getText().toString());
-                                            finish();
-                                        }
-                                    })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    HideProgressDialog();
-                                                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                } else {
-                                    HideProgressDialog();
-                                    DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Defect Add On");
-
-                                    defect defects = new defect(selectedDefectID, selectedImage, defect1String, projectDate, penCommentString);
-
-                                    databaseNewProject.child(selectedID).child(selectedDefectID).setValue(defects);
-
-                                    Toast.makeText(defectAddOn.this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(defectAddOn.this, defectList.class);
-                                    // intent.putExtra("pendingID", selectedID);
-                                    // intent.putExtra("Title",selectedTitle);
-                                    // startActivity(intent);
-                                    finish();
-                                }
-                            }
-
-                        } else if (items_update[which].equals("Update")) {
+                        if (items_update[which].equals("Update")) {
                             ShowProgressDialog();
                             final String projectDate = mProjectDate.getText().toString().trim();
                             final String defect1String = mDefect1.getText().toString().trim();
@@ -825,10 +679,6 @@ public class defectAddOn extends AppCompatActivity {
                                         StorageReference imageRef = mStorage.getReferenceFromUrl(selectedImage);
                                         imageRef.delete();
                                         updateProject(selectedDefectID, downloadUri.toString(), defect1String, projectDate, penCommentString);
-                                        Intent intent = new Intent(defectAddOn.this, defectList.class);
-                                        intent.putExtra("pendingID", selectedID);
-                                        intent.putExtra("Title", selectedTitle);
-                                        startActivity(intent);
                                     }
                                 })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -839,7 +689,7 @@ public class defectAddOn extends AppCompatActivity {
                                             }
                                         });
 
-                                deleteImageAddOn(selectedDefectID);
+                                   // deleteImageAddOn(selectedDefectID);
                                 for (int i = 0; i < listNewDefect.size(); i++) {
 
                                     StorageReference fileReferences = mStorageReference.child(System.currentTimeMillis()
@@ -853,8 +703,9 @@ public class defectAddOn extends AppCompatActivity {
                                             while (!uriTask.isSuccessful()) ;
                                             Uri downloadUri = uriTask.getResult();
                                             Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                                            String id = mDatabaseAddonImages.push().getKey();
-                                            updateImage(id,downloadUri.toString());
+                                                String id = mDatabaseAddonImages.push().getKey();
+                                                updateImage(id, downloadUri.toString());
+
                                         }
                                     })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -870,15 +721,13 @@ public class defectAddOn extends AppCompatActivity {
                                 HideProgressDialog();
                                 DatabaseReference databaseNewProject = FirebaseDatabase.getInstance().getReference("Defect Add On");
 
-                                defect defects = new defect(selectedDefectID, selectedImage, defect1String, projectDate, penCommentString);
+                                //defect defects = new defect(selectedDefectID, selectedImage, defect1String, projectDate, penCommentString);
 
-                                databaseNewProject.child(selectedID).child(selectedDefectID).setValue(defects);
+                                databaseNewProject.child(selectedID).child(selectedDefectID).child("comments").setValue(penCommentString);
+                                databaseNewProject.child(selectedID).child(selectedDefectID).child("date").setValue(projectDate);
+                                databaseNewProject.child(selectedID).child(selectedDefectID).child("defect").setValue(defect1String);
 
                                 Toast.makeText(defectAddOn.this, "Project Updated Successfully", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(defectAddOn.this, defectList.class);
-                                intent.putExtra("pendingID", selectedID);
-                                intent.putExtra("Title", selectedTitle);
-                                startActivity(intent);
                             }
                         } else if (items_update[which].equals("Cancel")) {
                             dialog.dismiss();
@@ -1004,30 +853,6 @@ public class defectAddOn extends AppCompatActivity {
         deleteDefectAddOn.child(id).removeValue();
 
         Toast.makeText(this, "Defect is deleted", Toast.LENGTH_SHORT).show();
-    }
-
-    private void onRetrieve() {
-
-        mDatabaseAddonImage.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                listNewDefect.clear();
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    defectImageAddon defectImage = dataSnapshot1.getValue(defectImageAddon.class);
-                    listNewDefect.add(defectImage);
-                }
-                defImageAdapter = new DefImageAdapter(defectAddOn.this, listNewDefect);
-                mUploadList.setAdapter(defImageAdapter);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
     }
 
 

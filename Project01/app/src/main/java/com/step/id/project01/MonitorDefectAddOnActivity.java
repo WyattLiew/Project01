@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.step.id.project01.RecyclerView.RecyclerTouchListener;
 import com.step.id.project01.RecyclerView.defectAddOnAdapter;
 import com.step.id.project01.model.defect;
 
@@ -59,6 +60,32 @@ public class MonitorDefectAddOnActivity extends AppCompatActivity {
         emptyView = findViewById(R.id.monitorDefect_empty_view);
 
         onRetrieve();
+
+        defectRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(MonitorDefectAddOnActivity.this, defectRecyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+
+                String rowid = listNewDefect.get(position).getId();
+                String defect = listNewDefect.get(position).getDefect();
+                String date = listNewDefect.get(position).getDate();
+                String comment = listNewDefect.get(position).getComments();
+                Intent intent = new Intent(MonitorDefectAddOnActivity.this, MonitorDefectAddOnDetailActivity.class);
+                intent.putExtra("defectAddon", rowid);
+                intent.putExtra("Title",selectedTitle);
+                intent.putExtra("UID",userID);
+                intent.putExtra("pendingID",selectedID);
+                intent.putExtra("defect",defect);
+                intent.putExtra("comment",comment);
+                intent.putExtra("date",date);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                //
+            }
+
+        }));
     }
     public void onRetrieve() {
 

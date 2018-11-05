@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.google.firebase.database.DataSnapshot;
@@ -72,19 +71,32 @@ public class defectList extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
 
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
                 String rowid = listNewDefect.get(position).getId();
                 String defect = listNewDefect.get(position).getDefect();
                 String date = listNewDefect.get(position).getDate();
                 String comment = listNewDefect.get(position).getComments();
 
                 int HideMenu = 1;
-                Log.d(TAG, "The row id is: " + rowid);
+                Intent intent = new Intent(defectList.this, defectDetails.class);
+                intent.putExtra("defectAddOn", rowid);
+                intent.putExtra("pendingID", selectedID);
+                intent.putExtra("defect1", defect);
+                intent.putExtra("date", date);
+                intent.putExtra("Title", selectedTitle);
+                intent.putExtra("comments", comment);
+                intent.putExtra("HideMenu", HideMenu);
+                startActivity(intent);
+            }
 
-                Log.d(TAG, "onItemClick: The ID is: " + rowid);
+            @Override
+            public void onLongClick(View view, int position) {
+                /**
+                String rowid = listNewDefect.get(position).getId();
+                String defect = listNewDefect.get(position).getDefect();
+                String date = listNewDefect.get(position).getDate();
+                String comment = listNewDefect.get(position).getComments();
+
+                int HideMenu = 1;
                 Intent intent = new Intent(defectList.this, defectAddOn.class);
                 intent.putExtra("defectAddOn", rowid);
                 intent.putExtra("pendingID", selectedID);
@@ -94,8 +106,7 @@ public class defectList extends AppCompatActivity {
                 intent.putExtra("Title", selectedTitle);
                 intent.putExtra("comments", comment);
                 intent.putExtra("HideMenu", HideMenu);
-                Log.d(TAG, "The row id is: " + rowid);
-                startActivity(intent);
+                startActivity(intent);**/
             }
         }));
     }

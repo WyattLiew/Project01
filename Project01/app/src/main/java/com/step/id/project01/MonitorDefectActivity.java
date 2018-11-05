@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.google.firebase.database.DataSnapshot;
@@ -57,12 +56,10 @@ public class MonitorDefectActivity extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
                 String rowid = listNewPending.get(position).getId();
-                Log.d(TAG, "The row id is: " + rowid);
                 Intent intent = new Intent(MonitorDefectActivity.this, MonitorDefectAddOnActivity.class);
                 intent.putExtra(pendingID, listNewPending.get(position).getId());
                 intent.putExtra("Title",listNewPending.get(position).getTitle());
                 intent.putExtra("UID",selectedID);
-                Log.d(TAG, "The tab 2 row id is: " + rowid);
                 startActivity(intent);
             }
 

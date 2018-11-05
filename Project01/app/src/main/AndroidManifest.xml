@@ -3,11 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.step.id.project01">
 
-    <supports-screens android:smallScreens="true"
-        android:normalScreens="true"
+    <supports-screens
+        android:anyDensity="true"
         android:largeScreens="true"
-        android:xlargeScreens="true"
-        android:anyDensity="true" />
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA2" />
@@ -33,18 +34,18 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
             android:largeHeap="true"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Defect.defectAddOn"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="Defect Editor" />
+            android:label="defect add on" />
         <activity
             android:name=".projectEditor"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -62,11 +63,14 @@
         </activity>
         <activity
             android:name=".Defect.defectList"
-            android:label="Defect List">
+            android:label="defect list">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name=".Defect.defectDetails"
+            android:label="details"></activity>
         <activity
             android:name=".Project.projectList"
             android:label="Progress List">
@@ -76,7 +80,7 @@
         </activity>
         <activity
             android:name=".Project.projectAddOn"
-            android:label="Project Add On"/>
+            android:label="project add on" />
         <activity
             android:name=".registerActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -89,27 +93,24 @@
         </activity>
         <activity
             android:name=".MonitorProjectActivity"
-            android:label="Project List">
+            android:label="Project list">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MonitorUserActivity" />
         </activity>
-
         <activity
             android:name=".MonitorProjectAddOnActivity"
-            android:label="Project Add On"/>
-
-        <activity android:name=".MonitorDefectActivity"
-            android:label="Defect List">
+            android:label="project add on" />
+        <activity
+            android:name=".MonitorDefectActivity"
+            android:label="Defect list">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MonitorUserActivity" />
         </activity>
-
-        <activity android:name=".MonitorDefectAddOnActivity"
-            android:label="Defect Add On">
-        </activity>
-
+        <activity
+            android:name=".MonitorDefectAddOnActivity"
+            android:label="defect add on" />
         <activity
             android:name=".ProfileActivity"
             android:label="My profile">
@@ -117,10 +118,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
+        <activity android:name=".MonitorDefectAddOnDetailActivity"
+            android:label="details">
+        </activity>
         <activity
             android:name=".ForgotPasswordActivity"
-            android:label="Forgot Password">
+            android:label="Forgot password">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
@@ -135,6 +138,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
 
     </application>
 
