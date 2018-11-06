@@ -114,7 +114,7 @@
                 android:text="@string/Pending_comment"/>
 
             <ImageView
-                android:id="@+id/defect_img"
+                android:id="@+id/def_backupImg"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
@@ -122,6 +122,18 @@
                 android:visibility="gone"/>
 
         </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/detailsFloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="175dp"
+            android:layout_marginEnd="14dp"
+            android:clickable="true"
+            app:backgroundTint="@color/colorSecondary"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
 
         <ProgressBar
             android:id="@+id/def_addon_progressBar"

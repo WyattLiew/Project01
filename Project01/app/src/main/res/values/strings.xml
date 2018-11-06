@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Project Management</string>
+    <string name="app_name">Step Design</string>
     <string name="tab_text_1">Home</string>
     <string name="tab_text_2">Project</string>
     <string name="tab_text_3">Pending</string>

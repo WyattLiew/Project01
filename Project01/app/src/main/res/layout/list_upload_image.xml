@@ -10,7 +10,7 @@
         android:layout_height="@dimen/_130sdp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="@mipmap/ic_launcher" />
+        android:background="@mipmap/loading" />
 
 
 </RelativeLayout>

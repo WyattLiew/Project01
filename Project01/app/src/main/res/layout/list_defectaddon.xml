@@ -21,7 +21,7 @@
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="100dp"
-                android:src="@mipmap/ic_launcher_round"
+                android:background="@mipmap/loading"
                 android:id="@+id/defectList_Image"/>
             <LinearLayout
                 android:layout_width="match_parent"
