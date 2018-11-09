@@ -155,7 +155,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="View projects"
+                    android:text="Admin only"
                     android:textColor="@android:color/darker_gray" />
             </LinearLayout>
         </android.support.v7.widget.CardView>

@@ -70,7 +70,7 @@
         </activity>
         <activity
             android:name=".Defect.defectDetails"
-            android:label="details"></activity>
+            android:label="details" />
         <activity
             android:name=".Project.projectList"
             android:label="Progress List">
@@ -118,9 +118,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".MonitorDefectAddOnDetailActivity"
-            android:label="details">
-        </activity>
+        <activity
+            android:name=".MonitorDefectAddOnDetailActivity"
+            android:label="details" />
         <activity
             android:name=".ForgotPasswordActivity"
             android:label="Forgot password">
@@ -139,7 +139,8 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-
+        <activity android:name=".Project.projectDetails" />
+        <activity android:name=".MonitorProjectAddOnDetailActivity"></activity>
     </application>
 
 </manifest>

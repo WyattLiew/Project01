@@ -16,4 +16,9 @@
         <item>@string/projectAddOn_InProgress</item>
         <item>@string/projectAddOn_Deferred</item>
     </string-array>
+    <string-array name="array_detailStatus_options">
+        <item>@string/projectAddOn_completed</item>
+        <item>@string/projectAddOn_InProgress</item>
+        <item>@string/projectAddOn_Deferred</item>
+    </string-array>
 </resources>

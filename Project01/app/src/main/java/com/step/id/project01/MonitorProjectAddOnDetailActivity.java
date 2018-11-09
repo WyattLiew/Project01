@@ -15,22 +15,23 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.step.id.project01.RecyclerView.DefImageAdapter;
-import com.step.id.project01.model.defectImageAddon;
+import com.step.id.project01.RecyclerView.ProjImageAdapter;
+import com.step.id.project01.model.projectImageAddon;
 
 import java.util.ArrayList;
 
-public class MonitorDefectAddOnDetailActivity extends AppCompatActivity {
-    private static final String TAG = "MonitorAddOnDetailActivity";
+public class MonitorProjectAddOnDetailActivity extends AppCompatActivity {
 
-    private TextView mDefectTextView, mCommentTextView, mDateTextView;
+    private static final String TAG = "MonitorProjectDetailActivity";
 
-    private String selectedID, selectedTitle,selectedDefectID,userID;
-    private String selectedComment, selectedDate, selectedDefect;
+    private TextView mStatusTextView, mNotesTextView, mDateTextView;
+
+    private String selectedID, selectedTitle,selectedProjectID,userID;
+    private String selectedNotes, selectedDate, selectedStatus;
 
     private RecyclerView mUploadList;
-    private ArrayList<defectImageAddon> listNewDefect =new ArrayList<>();
-    private DefImageAdapter defImageAdapter;
+    private ArrayList<projectImageAddon> listNewProject =new ArrayList<>();
+    private ProjImageAdapter projImageAdapter;
 
     //Fire base
     private DatabaseReference mDatabaseAddonRef,mDatabaseAddonImage;
@@ -38,7 +39,7 @@ public class MonitorDefectAddOnDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_monitor_defect_add_on_detail);
+        setContentView(R.layout.activity_monitor_project_add_on_detail);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -50,35 +51,35 @@ public class MonitorDefectAddOnDetailActivity extends AppCompatActivity {
 
         initDetails();
 
-        mUploadList = (RecyclerView) findViewById(R.id.MonitorDetailRecyclerView);
+        mUploadList = (RecyclerView) findViewById(R.id.MonitorProjectDetailsRecyclerView);
         mUploadList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mUploadList.setHasFixedSize(true);
 
-        mDatabaseAddonImage = FirebaseDatabase.getInstance().getReference("Defect add on image").child(selectedDefectID);
+        mDatabaseAddonImage = FirebaseDatabase.getInstance().getReference("Project add on image").child(selectedProjectID);
 
         onRetrieve();
 
     }
     public void initId() {
 
-        mDateTextView = (TextView)findViewById(R.id.Monitor_defectDate);
-        mDefectTextView = (TextView)findViewById(R.id.Monitor_defectTextView);
-        mCommentTextView = (TextView)findViewById(R.id.Monitor_commentTextView);
+        mDateTextView = (TextView)findViewById(R.id.Monitor_projDateTextView);
+        mStatusTextView = (TextView)findViewById(R.id.Monitor_statusTextView);
+        mNotesTextView = (TextView)findViewById(R.id.Monitor_notesTextView);
 
     }
 
     private void initDetails(){
         Intent intent = getIntent();
-        selectedID = intent.getStringExtra("pendingID");
-        selectedDefectID = intent.getStringExtra("defectAddon");
-        selectedDefect = intent.getStringExtra("defect");
-        selectedComment = intent.getStringExtra("comment");
+        selectedID = intent.getStringExtra("projectID");
+        selectedTitle = intent.getStringExtra("title");
+        selectedProjectID = intent.getStringExtra("projectAddOn");
+        selectedStatus = intent.getStringExtra("status");
+        selectedNotes = intent.getStringExtra("notes");
         selectedDate = intent.getStringExtra("date");
         userID = intent.getStringExtra("UID");
-        selectedTitle = intent.getStringExtra("Title");
 
-        mDefectTextView.setText(selectedDefect);
-        mCommentTextView.setText(selectedComment);
+        mStatusTextView.setText(selectedStatus);
+        mNotesTextView.setText(selectedNotes);
         mDateTextView.setText(selectedDate);
     }
 
@@ -88,13 +89,13 @@ public class MonitorDefectAddOnDetailActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                listNewDefect.clear();
+                listNewProject.clear();
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    defectImageAddon defectImage = dataSnapshot1.getValue(defectImageAddon.class);
-                    listNewDefect.add(defectImage);
+                    projectImageAddon projectImage = dataSnapshot1.getValue(projectImageAddon.class);
+                    listNewProject.add(projectImage);
                 }
-                defImageAdapter = new DefImageAdapter(MonitorDefectAddOnDetailActivity.this, listNewDefect);
-                mUploadList.setAdapter(defImageAdapter);
+                projImageAdapter = new ProjImageAdapter(MonitorProjectAddOnDetailActivity.this, listNewProject);
+                mUploadList.setAdapter(projImageAdapter);
 
             }
 
@@ -115,10 +116,10 @@ public class MonitorDefectAddOnDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(MonitorDefectAddOnDetailActivity.this, MonitorDefectAddOnActivity.class);
+                Intent intent = new Intent(MonitorProjectAddOnDetailActivity.this, MonitorProjectAddOnActivity.class);
                 intent.putExtra("UID",userID);
-                intent.putExtra("pendingID",selectedID);
-                intent.putExtra("Title",selectedTitle);
+                intent.putExtra("projectID",selectedID);
+                intent.putExtra("title",selectedTitle);
                 startActivity(intent);
                 return true;
         }
@@ -128,10 +129,10 @@ public class MonitorDefectAddOnDetailActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent = new Intent(MonitorDefectAddOnDetailActivity.this, MonitorDefectAddOnActivity.class);
+        Intent intent = new Intent(MonitorProjectAddOnDetailActivity.this, MonitorProjectAddOnActivity.class);
         intent.putExtra("UID",userID);
-        intent.putExtra("pendingID",selectedID);
-        intent.putExtra("Title",selectedTitle);
+        intent.putExtra("projectID",selectedID);
+        intent.putExtra("title",selectedTitle);
         startActivity(intent);
     }
 }

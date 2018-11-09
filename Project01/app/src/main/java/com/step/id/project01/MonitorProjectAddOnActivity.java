@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.step.id.project01.RecyclerView.RecyclerTouchListener;
 import com.step.id.project01.RecyclerView.projectAddOnAdapter;
 import com.step.id.project01.model.ProjectAddOnProvider;
 
@@ -35,7 +36,7 @@ public class MonitorProjectAddOnActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor_project_add_on);
 
@@ -59,6 +60,32 @@ public class MonitorProjectAddOnActivity extends AppCompatActivity {
         emptyView = findViewById(R.id.project_empty_view);
 
         onRetrieve();
+
+        projectRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(MonitorProjectAddOnActivity.this, projectRecyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+
+                String rowid = listNewProjectProviders.get(position).getId();
+                String status = listNewProjectProviders.get(position).getStatus();
+                String date =listNewProjectProviders.get(position).getDate();
+                String notes = listNewProjectProviders.get(position).getNotes();
+                Intent intent = new Intent(MonitorProjectAddOnActivity.this, MonitorProjectAddOnDetailActivity.class);
+                intent.putExtra("projectAddOn", rowid);
+                intent.putExtra("title",selectedTitle);
+                intent.putExtra("UID",userID);
+                intent.putExtra("projectID",selectedID);
+                intent.putExtra("status",status);
+                intent.putExtra("notes",notes);
+                intent.putExtra("date",date);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                //
+            }
+
+        }));
 
     }
 

@@ -81,10 +81,9 @@ public class projectList extends AppCompatActivity {
                 Log.d(TAG, "The row id is: " + rowid);
 
                     Log.d(TAG, "onItemClick: The ID is: " + rowid);
-                    Intent intent = new Intent(projectList.this, projectAddOn.class);
+                    Intent intent = new Intent(projectList.this, projectDetails.class);
                     intent.putExtra("projectAddOn", rowid);
                     intent.putExtra("projectID", selectedID);
-                    intent.putExtra("projImage", listNewProjectProviders.get(position).getImgURL());
                     intent.putExtra("status", status);
                     intent.putExtra("date", date);
                     intent.putExtra("title", selectedTitle);

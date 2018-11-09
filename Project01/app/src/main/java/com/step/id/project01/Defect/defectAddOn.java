@@ -97,7 +97,7 @@ public class defectAddOn extends AppCompatActivity {
 
     // Date
     private DatePickerDialog.OnDateSetListener mDateSetListener;
-    String date = "Select a date";
+    String date = "select a date";
 
     // Update data
     private String selectedComments, selectedprojDate, selectedDefect1;
@@ -109,7 +109,7 @@ public class defectAddOn extends AppCompatActivity {
     private DefImageAdapter defImageAdapter;
 
     //Fire base
-    private DatabaseReference mDatabaseAddon,mDatabaseAddonImages,mDatabaseAddonImage;
+    private DatabaseReference mDatabaseAddon,mDatabaseAddonImages;
     private StorageReference mStorageReference;
     private FirebaseStorage mStorage;
 
@@ -173,10 +173,6 @@ public class defectAddOn extends AppCompatActivity {
         //Check unsaved changes
         initCheckUnsavedChanges();
 
-        if (HideMenu == 1){
-            mDatabaseAddonImage= FirebaseDatabase.getInstance().getReference("Defect add on image").child(selectedDefectID);
-        }
-
     }
 
     private void SelectImage() {
@@ -217,7 +213,11 @@ public class defectAddOn extends AppCompatActivity {
                     //Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     Intent intent = new Intent();
                     intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    }else{
+                        intent.putExtra(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    }
                     intent.setAction(Intent.ACTION_GET_CONTENT);
                     startActivityForResult(intent.createChooser(intent, "Select picture"), SELECT_FILE);
                     //startActivityForResult(intent, SELECT_FILE);
@@ -410,7 +410,7 @@ public class defectAddOn extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (Build.VERSION.SDK_INT > 11) {
+        if (Build.VERSION.SDK_INT > 16) {
             invalidateOptionsMenu();
             if (HIDE_MENU) {
                 menu.findItem(R.id.action_update).setVisible(true);
@@ -433,10 +433,10 @@ public class defectAddOn extends AppCompatActivity {
 
     public void initId() {
 
-        mDefect1 = (EditText) findViewById(R.id.defect_1);
-        mPendingComment = (EditText) findViewById(R.id.defect_comment);
-        mProjectDate = (TextView) findViewById(R.id.defect_date);
-        projectImage = (ImageView) findViewById(R.id.defect_img);
+        mDefect1 = findViewById(R.id.defect_1);
+        mPendingComment =findViewById(R.id.defect_comment);
+        mProjectDate = findViewById(R.id.defect_date);
+        projectImage = findViewById(R.id.defect_img);
     }
 
     public void ShowProgressDialog() {
@@ -670,23 +670,11 @@ public class defectAddOn extends AppCompatActivity {
         Intent receivedIntent = getIntent();
         selectedID = receivedIntent.getStringExtra("pendingID");
         selectedTitle = receivedIntent.getStringExtra("Title");
-        selectedDefect1 = receivedIntent.getStringExtra("defect1");
-        selectedComments = receivedIntent.getStringExtra("comments");
         HideMenu = receivedIntent.getIntExtra("HideMenu", 0);
 
-        Log.d(TAG, "Selected ID is: " + selectedID);
-
         if (HideMenu == 1) {
-            selectedImage = receivedIntent.getStringExtra("projImage");
-            selectedprojDate = receivedIntent.getStringExtra("date");
-            mProjectDate.setText(selectedprojDate);
             selectedDefectID = receivedIntent.getStringExtra("defectAddOn");
         }
-
-
-        mDefect1.setText(selectedDefect1);
-        mPendingComment.setText(selectedComments);
-
 
         // Hide save menu
         if (HideMenu == 1) {

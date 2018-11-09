@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Project.projectAddOn">
+    tools:context=".MonitorProjectAddOnDetailActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,7 +33,7 @@
                     android:orientation="vertical">
 
                     <android.support.v7.widget.RecyclerView
-                        android:id="@+id/projectUploadRecyclerView"
+                        android:id="@+id/MonitorProjectDetailsRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                     </android.support.v7.widget.RecyclerView>
@@ -50,22 +50,23 @@
             android:padding= "10dp"
             android:background="#fff">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:src="@mipmap/ic_list_done"
-                android:padding="10dp"/>
-            <Spinner
-                android:id="@+id/spinner_projectStatus"
-                android:layout_height="64dp"
-                android:layout_width="wrap_content"
-                android:paddingRight="16dp"
-                android:spinnerMode="dropdown"/>
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@mipmap/ic_list_done"
+                    android:padding="10dp"/>
+                <TextView
+                    android:id="@+id/Monitor_statusTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:text="Completed"/>
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,19 +80,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <TextView
-                        android:id="@+id/starts_on"
+                        android:id="@+id/Monitor_projDateTextView"
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/starts_on"
-                        android:layout_marginLeft="20dp"/>
-                    <TextView
-                        android:layout_width="90dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/select_a_date"
-                        android:id="@+id/projectAddOnDate"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="20dp"
+                        android:text="@string/select_a_date" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -108,35 +103,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp">
-                    <EditText
-                        android:id="@+id/projectAddOnNotes"
+                    <TextView
+                        android:id="@+id/Monitor_notesTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:inputType="textMultiLine"
-                        android:hint="Notes (Optional)"/>
+                        android:layout_marginTop="20dp"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                        android:text="Notes (Optional)"/>
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
             <ImageView
-                android:id="@+id/projectAddOn_img"
+                android:id="@+id/Monitor_backupImg"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:visibility="gone"/>
         </LinearLayout>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/projectAddOn_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="175dp"
-            android:layout_marginEnd="14dp"
-            android:clickable="true"
-            app:backgroundTint="@color/colorSecondary"
-            app:srcCompat="@android:drawable/ic_menu_camera" />
 
     </RelativeLayout>
 </ScrollView>

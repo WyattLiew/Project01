@@ -70,7 +70,6 @@ public class tab2_project extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 String rowid = listNewProjectProviders.get(position).getId();
-                Log.d(TAG, "The row id is: " + rowid);
                 Intent intent = new Intent(getActivity().getApplicationContext(), projectList.class);
                 intent.putExtra(projectID, listNewProjectProviders.get(position).getId());
                 intent.putExtra("title",listNewProjectProviders.get(position).getTitle());
